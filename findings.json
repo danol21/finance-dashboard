@@ -7,5 +7,14 @@
     "rating": "🟡",
     "summary": "This is a placeholder finding so you can see how the sync banner works end to end.",
     "suggestedAction": "Replace the contents of this file with real findings from your monthly review, or delete this example entry."
+  },
+  {
+    "id": "irs-notice-2026-49-rollover-2026-09",
+    "date": "2026-09-12",
+    "source": "IRS Notice 2026-49",
+    "url": "https://www.irs.gov/pub/irs-drop/n-26-49.pdf",
+    "rating": "🟡",
+    "summary": "On August 12, 2026 the IRS released Notice 2026-49, proposing sample forms and standardized procedures for rollovers between employer retirement plans and IRAs under SECURE 2.0 Section 324 (IRA-to-IRA transfers aren't covered). It's still a draft: the IRS is taking public comments through October 23, 2026, so nothing is final or mandatory yet.",
+    "suggestedAction": "No action needed now. When you eventually roll your 401(k)/403(b) over to an IRA at retirement, expect a more standardized paperwork process; revisit once the IRS finalizes the procedure."
   }
 ]
