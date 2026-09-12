@@ -8,6 +8,8 @@ export const seedData = {
     spouseYoungerBy: 4,
     realReturn: 7,
     nestEggGoal: "",
+    withdrawalRate: 4.0,
+    annualSpending: "",
     lastStructuralReview: "",
     contributionLimits: {
       limit401k: 24500,

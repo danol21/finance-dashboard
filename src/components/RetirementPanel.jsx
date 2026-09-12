@@ -37,8 +37,16 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
     electiveDeferralLimit: num(settings.contributionLimits?.limit401k),
   });
 
-  const goal = num(settings.nestEggGoal);
-  const goalGap = settings.nestEggGoal !== "" ? projected - goal : null;
+  const manualGoal = settings.nestEggGoal !== "" ? num(settings.nestEggGoal) : null;
+  const withdrawalRate = num(settings.withdrawalRate);
+  const annualSpending = settings.annualSpending !== "" ? num(settings.annualSpending) : null;
+  const derivedGoal =
+    annualSpending !== null && withdrawalRate > 0 ? annualSpending / (withdrawalRate / 100) : null;
+
+  const effectiveGoal = manualGoal ?? derivedGoal;
+  const goalGap = effectiveGoal !== null ? projected - effectiveGoal : null;
+  const goalsDiffer = manualGoal !== null && derivedGoal !== null;
+  const goalComparisonGap = goalsDiffer ? derivedGoal - manualGoal : null;
 
   const set = (field) => (e) => {
     const value = e.target.type === "checkbox" ? e.target.checked : e.target.value;
@@ -104,7 +112,7 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
         </div>
 
         <div className="field">
-          <label htmlFor="nest-egg">Nest-egg goal (optional)</label>
+          <label htmlFor="nest-egg">Nest-egg goal (optional, manual)</label>
           <input
             id="nest-egg"
             type="number"
@@ -112,6 +120,33 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
             placeholder="e.g. 2000000"
             value={settings.nestEggGoal}
             onChange={set("nestEggGoal")}
+          />
+        </div>
+
+        <div className="field">
+          <label htmlFor="withdrawal-rate">Target withdrawal rate (%)</label>
+          <input
+            id="withdrawal-rate"
+            type="number"
+            step="0.1"
+            value={settings.withdrawalRate}
+            onChange={set("withdrawalRate")}
+          />
+          <span className="field-hint">
+            4% is a conservative planning anchor for a diversified, 35+ year horizon — not
+            necessarily the rate to withdraw at; can be revisited closer to retirement.
+          </span>
+        </div>
+
+        <div className="field">
+          <label htmlFor="annual-spending">Annual retirement spending (optional)</label>
+          <input
+            id="annual-spending"
+            type="number"
+            inputMode="decimal"
+            placeholder="e.g. 80000"
+            value={settings.annualSpending}
+            onChange={set("annualSpending")}
           />
         </div>
       </div>
@@ -130,10 +165,30 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
           <span className="stat-label">Projected balance at retirement</span>
           <span className="stat-value stat-value-lg">{formatCurrency(projected)}</span>
         </div>
+        {derivedGoal !== null && (
+          <div className="stat">
+            <span className="stat-label">Derived nest-egg goal (spending ÷ rate)</span>
+            <span className="stat-value">{formatCurrency(derivedGoal)}</span>
+            <span className="stat-sub">
+              {formatCurrency(annualSpending)}/yr ÷ {withdrawalRate}%
+            </span>
+          </div>
+        )}
+        {goalComparisonGap !== null && (
+          <div className={`stat ${goalComparisonGap >= 0 ? "stat-positive" : "stat-negative"}`}>
+            <span className="stat-label">
+              Derived vs. manual goal — {goalComparisonGap >= 0 ? "derived is higher" : "derived is lower"}
+            </span>
+            <span className="stat-value">{formatCurrency(Math.abs(goalComparisonGap))}</span>
+          </div>
+        )}
         {goalGap !== null && (
           <div className={`stat ${goalGap >= 0 ? "stat-positive" : "stat-negative"}`}>
             <span className="stat-label">{goalGap >= 0 ? "Surplus vs. goal" : "Shortfall vs. goal"}</span>
             <span className="stat-value">{formatCurrency(Math.abs(goalGap))}</span>
+            <span className="stat-sub">
+              vs. {manualGoal !== null ? "manual" : "derived"} goal of {formatCurrency(effectiveGoal)}
+            </span>
           </div>
         )}
       </div>
