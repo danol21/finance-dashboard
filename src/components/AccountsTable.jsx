@@ -1,5 +1,15 @@
-import { num, effectiveMonthly, formatCurrency, formatCurrencyPrecise, isElectiveDeferralType } from "../lib/finance";
+import { Fragment, useState } from "react";
+import {
+  num,
+  effectiveMonthly,
+  formatCurrency,
+  formatCurrencyPrecise,
+  isElectiveDeferralType,
+  isLumpSumMode,
+  lumpSumTotalForYear,
+} from "../lib/finance";
 import { makeId } from "../lib/storage";
+import LumpSumEditor from "./LumpSumEditor";
 
 const ACCOUNT_TYPES = [
   "Brokerage",
@@ -14,11 +24,39 @@ const ACCOUNT_TYPES = [
 ];
 
 export default function AccountsTable({ accounts, onChange }) {
+  const [expandedIds, setExpandedIds] = useState(() => new Set());
+
   const totalBalance = accounts.reduce((sum, a) => sum + num(a.balance), 0);
   const totalMonthly = accounts.reduce((sum, a) => sum + effectiveMonthly(a), 0);
 
   const updateRow = (id, field, value) => {
     onChange(accounts.map((a) => (a.id === id ? { ...a, [field]: value } : a)));
+  };
+
+  const toggleContributionMode = (id) => {
+    onChange(
+      accounts.map((a) =>
+        a.id === id
+          ? {
+              ...a,
+              contributionMode: isLumpSumMode(a) ? "monthly" : "lumpSum",
+              lumpSums: a.lumpSums ?? [],
+            }
+          : a
+      )
+    );
+  };
+
+  const toggleExpanded = (id) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
   const addRow = () => {
@@ -63,103 +101,163 @@ export default function AccountsTable({ accounts, onChange }) {
             </tr>
           </thead>
           <tbody>
-            {accounts.map((a) => (
-              <tr key={a.id}>
-                <td>
-                  <input
-                    className="cell-input"
-                    value={a.name}
-                    onChange={(e) => updateRow(a.id, "name", e.target.value)}
-                    placeholder="Account name"
-                  />
-                </td>
-                <td>
-                  <input
-                    className="cell-input"
-                    value={a.institution}
-                    onChange={(e) => updateRow(a.id, "institution", e.target.value)}
-                    placeholder="Institution"
-                  />
-                </td>
-                <td>
-                  <select
-                    className="cell-input"
-                    value={a.type}
-                    onChange={(e) => updateRow(a.id, "type", e.target.value)}
-                  >
-                    {ACCOUNT_TYPES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-                <td className="col-num">
-                  <input
-                    className="cell-input cell-num"
-                    inputMode="decimal"
-                    value={a.balance}
-                    onChange={(e) => updateRow(a.id, "balance", e.target.value)}
-                    placeholder="0.00"
-                  />
-                </td>
-                <td className="col-num">
-                  {isElectiveDeferralType(a.type) ? (
-                    <div className="split-monthly">
-                      <div className="split-monthly-row">
-                        <span className="split-monthly-label">EE</span>
-                        <input
-                          className="cell-input cell-num"
-                          inputMode="decimal"
-                          value={a.employeeMonthly ?? ""}
-                          onChange={(e) => updateRow(a.id, "employeeMonthly", e.target.value)}
-                          placeholder="0.00"
-                          title="Employee contribution (pre-tax + Roth)"
-                        />
-                      </div>
-                      <div className="split-monthly-row">
-                        <span className="split-monthly-label">ER</span>
-                        <input
-                          className="cell-input cell-num"
-                          inputMode="decimal"
-                          value={a.employerMonthly ?? ""}
-                          onChange={(e) => updateRow(a.id, "employerMonthly", e.target.value)}
-                          placeholder="0.00"
-                          title="Employer match / Safe Harbor"
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    <input
-                      className="cell-input cell-num"
-                      inputMode="decimal"
-                      value={a.monthly}
-                      onChange={(e) => updateRow(a.id, "monthly", e.target.value)}
-                      placeholder="0.00"
-                    />
-                  )}
-                </td>
-                <td>
-                  <input
-                    className="cell-input"
-                    value={a.notes}
-                    onChange={(e) => updateRow(a.id, "notes", e.target.value)}
-                    placeholder="Notes"
-                  />
-                </td>
-                <td>
-                  <button
-                    className="btn btn-icon"
-                    onClick={() => removeRow(a.id)}
-                    type="button"
-                    aria-label="Remove account"
-                    title="Remove account"
-                  >
-                    ✕
+            {accounts.map((a) => {
+              const lumpSum = isLumpSumMode(a);
+              const entries = a.lumpSums ?? [];
+              const expanded = expandedIds.has(a.id);
+
+              const lumpSumChip = (
+                <div className="lumpsum-cell">
+                  <button type="button" className="lumpsum-summary" onClick={() => toggleExpanded(a.id)}>
+                    <span className="lumpsum-total">{formatCurrencyPrecise(lumpSumTotalForYear(a))}</span>
+                    <span className="lumpsum-count">
+                      {entries.length} deposit{entries.length === 1 ? "" : "s"} · {expanded ? "hide" : "manage"}
+                    </span>
                   </button>
-                </td>
-              </tr>
-            ))}
+                  <button
+                    type="button"
+                    className="btn btn-icon-text mode-toggle-btn"
+                    onClick={() => toggleContributionMode(a.id)}
+                  >
+                    Switch to monthly
+                  </button>
+                </div>
+              );
+
+              return (
+                <Fragment key={a.id}>
+                  <tr>
+                    <td>
+                      <input
+                        className="cell-input"
+                        value={a.name}
+                        onChange={(e) => updateRow(a.id, "name", e.target.value)}
+                        placeholder="Account name"
+                      />
+                    </td>
+                    <td>
+                      <input
+                        className="cell-input"
+                        value={a.institution}
+                        onChange={(e) => updateRow(a.id, "institution", e.target.value)}
+                        placeholder="Institution"
+                      />
+                    </td>
+                    <td>
+                      <select
+                        className="cell-input"
+                        value={a.type}
+                        onChange={(e) => updateRow(a.id, "type", e.target.value)}
+                      >
+                        {ACCOUNT_TYPES.map((t) => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    <td className="col-num">
+                      <input
+                        className="cell-input cell-num"
+                        inputMode="decimal"
+                        value={a.balance}
+                        onChange={(e) => updateRow(a.id, "balance", e.target.value)}
+                        placeholder="0.00"
+                      />
+                    </td>
+                    <td className="col-num">
+                      {isElectiveDeferralType(a.type) ? (
+                        <div className="split-monthly">
+                          <div className="split-monthly-row">
+                            <span className="split-monthly-label">EE</span>
+                            {lumpSum ? (
+                              lumpSumChip
+                            ) : (
+                              <input
+                                className="cell-input cell-num"
+                                inputMode="decimal"
+                                value={a.employeeMonthly ?? ""}
+                                onChange={(e) => updateRow(a.id, "employeeMonthly", e.target.value)}
+                                placeholder="0.00"
+                                title="Employee contribution (pre-tax + Roth)"
+                              />
+                            )}
+                          </div>
+                          <div className="split-monthly-row">
+                            <span className="split-monthly-label">ER</span>
+                            <input
+                              className="cell-input cell-num"
+                              inputMode="decimal"
+                              value={a.employerMonthly ?? ""}
+                              onChange={(e) => updateRow(a.id, "employerMonthly", e.target.value)}
+                              placeholder="0.00"
+                              title="Employer match / Safe Harbor"
+                            />
+                          </div>
+                          {!lumpSum && (
+                            <button
+                              type="button"
+                              className="btn btn-icon-text mode-toggle-btn"
+                              onClick={() => toggleContributionMode(a.id)}
+                            >
+                              Switch EE to lump sums
+                            </button>
+                          )}
+                        </div>
+                      ) : lumpSum ? (
+                        lumpSumChip
+                      ) : (
+                        <div className="lumpsum-cell">
+                          <input
+                            className="cell-input cell-num"
+                            inputMode="decimal"
+                            value={a.monthly}
+                            onChange={(e) => updateRow(a.id, "monthly", e.target.value)}
+                            placeholder="0.00"
+                          />
+                          <button
+                            type="button"
+                            className="btn btn-icon-text mode-toggle-btn"
+                            onClick={() => toggleContributionMode(a.id)}
+                          >
+                            Switch to lump sums
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <input
+                        className="cell-input"
+                        value={a.notes}
+                        onChange={(e) => updateRow(a.id, "notes", e.target.value)}
+                        placeholder="Notes"
+                      />
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-icon"
+                        onClick={() => removeRow(a.id)}
+                        type="button"
+                        aria-label="Remove account"
+                        title="Remove account"
+                      >
+                        ✕
+                      </button>
+                    </td>
+                  </tr>
+                  {lumpSum && expanded && (
+                    <tr className="lumpsum-editor-row">
+                      <td colSpan={7}>
+                        <LumpSumEditor
+                          entries={entries}
+                          onChange={(lumpSums) => updateRow(a.id, "lumpSums", lumpSums)}
+                        />
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
           </tbody>
           <tfoot>
             <tr>

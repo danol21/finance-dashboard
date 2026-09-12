@@ -2,6 +2,8 @@ import {
   num,
   effectiveMonthly,
   isElectiveDeferralType,
+  employeeMonthlyAmount,
+  nonElectiveMonthlyAmount,
   projectBalance,
   formatCurrency,
   formatCurrencyPrecise,
@@ -19,13 +21,13 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
 
   const employeeMonthly = accounts
     .filter((a) => isElectiveDeferralType(a.type))
-    .reduce((sum, a) => sum + num(a.employeeMonthly ?? a.monthly), 0);
+    .reduce((sum, a) => sum + employeeMonthlyAmount(a), 0);
   const employerMonthly = accounts
     .filter((a) => isElectiveDeferralType(a.type))
     .reduce((sum, a) => sum + num(a.employerMonthly), 0);
   const otherMonthly = accounts
     .filter((a) => !isElectiveDeferralType(a.type))
-    .reduce((sum, a) => sum + num(a.monthly), 0);
+    .reduce((sum, a) => sum + nonElectiveMonthlyAmount(a), 0);
 
   const projected = projectBalance({
     presentValue: totalBalance,

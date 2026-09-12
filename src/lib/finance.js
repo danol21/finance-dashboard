@@ -9,11 +9,44 @@ export function isElectiveDeferralType(type) {
   return type === "401(k)" || type === "403(b)";
 }
 
+// An account can be funded by irregular lump sums (e.g. a Backdoor Roth IRA
+// filled from quarterly bonuses) instead of a steady monthly amount.
+export function isLumpSumMode(account) {
+  return account.contributionMode === "lumpSum";
+}
+
+// Sum of an account's logged lump-sum deposits dated within `year`.
+export function lumpSumTotalForYear(account, year = new Date().getFullYear()) {
+  return (account.lumpSums ?? []).reduce((sum, entry) => {
+    if (!entry.date) return sum;
+    return new Date(entry.date).getFullYear() === year ? sum + num(entry.amount) : sum;
+  }, 0);
+}
+
+// This year's lump sums spread evenly over 12 months, so growth-projection
+// panels that expect a steady monthly figure still get a sensible number
+// instead of treating a lump-sum account as contributing $0/mo.
+function lumpSumAverageMonthly(account) {
+  return lumpSumTotalForYear(account) / 12;
+}
+
+// Employee/primary contribution for an account, in monthly terms.
+export function employeeMonthlyAmount(account) {
+  if (isLumpSumMode(account)) return lumpSumAverageMonthly(account);
+  return num(account.employeeMonthly ?? account.monthly);
+}
+
+// Non-401(k)/403(b) account's contribution, in monthly terms.
+export function nonElectiveMonthlyAmount(account) {
+  if (isLumpSumMode(account)) return lumpSumAverageMonthly(account);
+  return num(account.monthly);
+}
+
 export function effectiveMonthly(account) {
   if (isElectiveDeferralType(account.type)) {
-    return num(account.employeeMonthly) + num(account.employerMonthly);
+    return employeeMonthlyAmount(account) + num(account.employerMonthly);
   }
-  return num(account.monthly);
+  return nonElectiveMonthlyAmount(account);
 }
 
 /**

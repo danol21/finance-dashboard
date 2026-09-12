@@ -1,4 +1,12 @@
-import { num, effectiveMonthly, formatCurrency } from "../lib/finance";
+import {
+  num,
+  effectiveMonthly,
+  employeeMonthlyAmount,
+  nonElectiveMonthlyAmount,
+  isLumpSumMode,
+  lumpSumTotalForYear,
+  formatCurrency,
+} from "../lib/finance";
 
 const LIMIT_CATEGORIES = [
   {
@@ -25,22 +33,26 @@ const LIMIT_CATEGORIES = [
 
 const SHORTFALL_THRESHOLD = 0.85;
 
-function statusFor(annualPace, limit, monthsRemaining) {
+// `allowPaceWatch` is false when a category is funded entirely by logged lump
+// sums rather than a steady monthly amount — there's no "monthly pace" to
+// judge, only an actual running total, so the shortfall warning doesn't apply.
+function statusFor(annualTotal, limit, monthsRemaining, allowPaceWatch) {
   if (limit <= 0) return { key: "none", emoji: "🟢", label: "No limit set" };
-  if (annualPace > limit) {
-    return { key: "act", emoji: "🔴", label: "Projected to exceed limit" };
+  if (annualTotal > limit) {
+    return {
+      key: "act",
+      emoji: "🔴",
+      label: allowPaceWatch ? "Projected to exceed limit" : "Already over the limit",
+    };
   }
-  if (monthsRemaining > 0 && annualPace < limit * SHORTFALL_THRESHOLD) {
+  if (allowPaceWatch && monthsRemaining > 0 && annualTotal < limit * SHORTFALL_THRESHOLD) {
     return { key: "watch", emoji: "🟡", label: "On pace to fall meaningfully short" };
   }
-  return { key: "none", emoji: "🟢", label: "On track" };
-}
-
-// Employee-only monthly figure: for 401(k)/403(b) accounts the elective-deferral
-// limit applies to the employee's own pre-tax + Roth money, not employer
-// match/Safe Harbor contributions.
-function employeeMonthly(account) {
-  return num(account.employeeMonthly ?? account.monthly);
+  return {
+    key: "none",
+    emoji: "🟢",
+    label: allowPaceWatch ? "On track" : annualTotal >= limit ? "Limit reached" : "Funded, room remaining",
+  };
 }
 
 export default function ContributionLimitsPanel({ limits, accounts, onChange }) {
@@ -58,12 +70,25 @@ export default function ContributionLimitsPanel({ limits, accounts, onChange }) 
         {LIMIT_CATEGORIES.map((cat) => {
           const matching = accounts.filter((a) => cat.matchTypes.includes(a.type));
           const limitValue = num(limits[cat.key]);
+
+          const hasLumpSum = matching.some(isLumpSumMode);
+          const hasMonthly = matching.some((a) => !isLumpSumMode(a));
+
+          // For a lump-sum account this isn't a pace — employeeMonthlyAmount /
+          // nonElectiveMonthlyAmount return this year's logged total divided
+          // by 12, so multiplying back by 12 below recovers the actual total.
           const monthlyTotal = matching.reduce(
-            (sum, a) => sum + (cat.employeeOnly ? employeeMonthly(a) : num(a.monthly)),
+            (sum, a) =>
+              sum + (cat.employeeOnly ? employeeMonthlyAmount(a) : nonElectiveMonthlyAmount(a)),
             0
           );
           const annualPace = monthlyTotal * 12;
-          const status = statusFor(annualPace, limitValue, monthsRemaining);
+          const lumpSumFundedTotal = matching
+            .filter(isLumpSumMode)
+            .reduce((sum, a) => sum + lumpSumTotalForYear(a), 0);
+          const roomLeft = limitValue > 0 ? limitValue - annualPace : null;
+
+          const status = statusFor(annualPace, limitValue, monthsRemaining, hasMonthly);
           const pct = limitValue > 0 ? Math.min((annualPace / limitValue) * 100, 999) : 0;
 
           const secondary = cat.secondary;
@@ -102,11 +127,25 @@ export default function ContributionLimitsPanel({ limits, accounts, onChange }) 
 
               <div className="limit-summary">
                 <span>
-                  Paced at <strong>{formatCurrency(annualPace)}</strong>
+                  {hasMonthly ? "Paced at " : "Funded so far: "}
+                  <strong>{formatCurrency(annualPace)}</strong>
                   {limitValue > 0 ? ` (${pct.toFixed(0)}% of limit)` : ""}
                 </span>
+                {roomLeft !== null && (
+                  <span className="limit-room-left">
+                    {roomLeft >= 0
+                      ? `${formatCurrency(roomLeft)} room left`
+                      : `${formatCurrency(-roomLeft)} over the limit`}
+                  </span>
+                )}
                 <span className="limit-status-label">{status.label}</span>
               </div>
+
+              {hasLumpSum && hasMonthly && (
+                <p className="limit-lumpsum-note">
+                  Of which from logged lump sums: <strong>{formatCurrency(lumpSumFundedTotal)}</strong>
+                </p>
+              )}
 
               {secondary && (
                 <div className="limit-secondary">

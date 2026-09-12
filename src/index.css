@@ -336,6 +336,108 @@ textarea {
   text-align: right;
 }
 
+.lumpsum-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 150px;
+}
+
+.lumpsum-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.05rem;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 0.3rem 0.5rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.lumpsum-summary:hover {
+  border-color: var(--border-subtle);
+}
+
+.lumpsum-total {
+  font-family: "Spectral", Georgia, serif;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.lumpsum-count {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.mode-toggle-btn {
+  align-self: flex-end;
+  padding: 0.15rem 0.4rem;
+  font-size: 0.68rem;
+  border-color: transparent;
+  color: var(--text-muted);
+}
+
+.mode-toggle-btn:hover {
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+}
+
+.lumpsum-editor-row td {
+  padding: 0.75rem 0.6rem 1rem;
+  background: var(--ink-navy-raised-2);
+}
+
+.lumpsum-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 420px;
+}
+
+.lumpsum-editor-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.lumpsum-editor-total {
+  color: var(--gold);
+  font-family: "Spectral", Georgia, serif;
+}
+
+.lumpsum-empty {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.lumpsum-entry-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lumpsum-entry-other-year {
+  opacity: 0.6;
+}
+
+.lumpsum-entry-note {
+  font-size: 0.68rem;
+  color: var(--status-watch);
+  white-space: nowrap;
+}
+
+.lumpsum-add-btn {
+  align-self: flex-start;
+}
+
 .ledger-table tfoot td {
   border-bottom: none;
   border-top: 2px solid var(--border-subtle);
@@ -581,6 +683,21 @@ textarea {
 .limit-status-label {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+.limit-room-left {
+  color: var(--text-primary);
+}
+
+.limit-lumpsum-note {
+  margin: -0.2rem 0 0;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.limit-lumpsum-note strong {
+  font-family: "Spectral", Georgia, serif;
+  color: var(--text-primary);
 }
 
 .limit-secondary {
