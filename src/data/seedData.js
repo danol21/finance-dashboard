@@ -11,7 +11,7 @@ export const seedData = {
     lastStructuralReview: "",
     contributionLimits: {
       limit401k: 24500,
-      limitIRA: 7000,
+      limitIRA: 7500,
       limitHSA: 8750,
       limit415c: 72000,
     },
