@@ -1,4 +1,4 @@
-import { num, formatCurrency, formatCurrencyPrecise } from "../lib/finance";
+import { num, effectiveMonthly, formatCurrency, formatCurrencyPrecise, isElectiveDeferralType } from "../lib/finance";
 import { makeId } from "../lib/storage";
 
 const ACCOUNT_TYPES = [
@@ -15,7 +15,7 @@ const ACCOUNT_TYPES = [
 
 export default function AccountsTable({ accounts, onChange }) {
   const totalBalance = accounts.reduce((sum, a) => sum + num(a.balance), 0);
-  const totalMonthly = accounts.reduce((sum, a) => sum + num(a.monthly), 0);
+  const totalMonthly = accounts.reduce((sum, a) => sum + effectiveMonthly(a), 0);
 
   const updateRow = (id, field, value) => {
     onChange(accounts.map((a) => (a.id === id ? { ...a, [field]: value } : a)));
@@ -104,13 +104,40 @@ export default function AccountsTable({ accounts, onChange }) {
                   />
                 </td>
                 <td className="col-num">
-                  <input
-                    className="cell-input cell-num"
-                    inputMode="decimal"
-                    value={a.monthly}
-                    onChange={(e) => updateRow(a.id, "monthly", e.target.value)}
-                    placeholder="0.00"
-                  />
+                  {isElectiveDeferralType(a.type) ? (
+                    <div className="split-monthly">
+                      <div className="split-monthly-row">
+                        <span className="split-monthly-label">EE</span>
+                        <input
+                          className="cell-input cell-num"
+                          inputMode="decimal"
+                          value={a.employeeMonthly ?? ""}
+                          onChange={(e) => updateRow(a.id, "employeeMonthly", e.target.value)}
+                          placeholder="0.00"
+                          title="Employee contribution (pre-tax + Roth)"
+                        />
+                      </div>
+                      <div className="split-monthly-row">
+                        <span className="split-monthly-label">ER</span>
+                        <input
+                          className="cell-input cell-num"
+                          inputMode="decimal"
+                          value={a.employerMonthly ?? ""}
+                          onChange={(e) => updateRow(a.id, "employerMonthly", e.target.value)}
+                          placeholder="0.00"
+                          title="Employer match / Safe Harbor"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <input
+                      className="cell-input cell-num"
+                      inputMode="decimal"
+                      value={a.monthly}
+                      onChange={(e) => updateRow(a.id, "monthly", e.target.value)}
+                      placeholder="0.00"
+                    />
+                  )}
                 </td>
                 <td>
                   <input

@@ -315,6 +315,27 @@ textarea {
   font-family: "Spectral", Georgia, serif;
 }
 
+.split-monthly {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 130px;
+}
+
+.split-monthly-row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.split-monthly-label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  width: 1.4em;
+  flex-shrink: 0;
+  text-align: right;
+}
+
 .ledger-table tfoot td {
   border-bottom: none;
   border-top: 2px solid var(--border-subtle);
@@ -560,6 +581,35 @@ textarea {
 .limit-status-label {
   font-size: 0.75rem;
   color: var(--text-muted);
+}
+
+.limit-secondary {
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 0.6rem;
+  margin-top: 0.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.limit-field-secondary label {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.limit-field-secondary input {
+  background: var(--ink-navy-raised-2);
+  font-size: 0.85rem;
+}
+
+.limit-secondary-summary {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.limit-secondary-summary strong {
+  font-family: "Spectral", Georgia, serif;
+  color: var(--text-secondary);
 }
 
 /* Quarterly checklist */

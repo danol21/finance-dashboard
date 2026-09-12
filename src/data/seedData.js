@@ -13,6 +13,7 @@ export const seedData = {
       limit401k: 24500,
       limitIRA: 7000,
       limitHSA: 8750,
+      limit415c: 72000,
     },
   },
   accounts: [
@@ -31,7 +32,8 @@ export const seedData = {
       institution: "Example Retirement Co.",
       type: "401(k)",
       balance: "0",
-      monthly: "0",
+      employeeMonthly: "0",
+      employerMonthly: "0",
       notes: "",
     },
   ],

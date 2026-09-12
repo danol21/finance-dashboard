@@ -1,8 +1,8 @@
-import { num, projectBalance, formatCurrency, formatCurrencyPrecise } from "../lib/finance";
+import { num, effectiveMonthly, projectBalance, formatCurrency, formatCurrencyPrecise } from "../lib/finance";
 
 export default function RetirementPanel({ settings, onChange, accounts }) {
   const totalBalance = accounts.reduce((sum, a) => sum + num(a.balance), 0);
-  const totalMonthly = accounts.reduce((sum, a) => sum + num(a.monthly), 0);
+  const totalMonthly = accounts.reduce((sum, a) => sum + effectiveMonthly(a), 0);
 
   const selfAge = num(settings.selfCurrentAge);
   const targetAge = num(settings.targetAge);

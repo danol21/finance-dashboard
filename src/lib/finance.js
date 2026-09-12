@@ -3,6 +3,19 @@ export function num(value) {
   return Number.isFinite(n) ? n : 0;
 }
 
+// 401(k)/403(b) accounts split employee vs. employer money — the elective-deferral
+// limit only applies to the employee's own pre-tax + Roth contributions.
+export function isElectiveDeferralType(type) {
+  return type === "401(k)" || type === "403(b)";
+}
+
+export function effectiveMonthly(account) {
+  if (isElectiveDeferralType(account.type)) {
+    return num(account.employeeMonthly) + num(account.employerMonthly);
+  }
+  return num(account.monthly);
+}
+
 /**
  * Future value of a present sum plus a stream of monthly contributions,
  * compounded monthly at `annualRatePct` (real return, %).

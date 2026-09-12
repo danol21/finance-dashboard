@@ -1,6 +1,19 @@
 import { seedData } from "../data/seedData";
+import { isElectiveDeferralType } from "./finance";
 
 const STORAGE_KEY = "ledger-dashboard-data";
+
+// Existing 401(k)/403(b) accounts predate the employee/employer split and only
+// carry a single combined "monthly" figure. Preserve that total as the employee
+// share by default (nothing changes for the elective-deferral check until the
+// user fills in the real split), rather than silently losing the old figure.
+function migrateAccount(account) {
+  if (!isElectiveDeferralType(account.type)) return account;
+  if (account.employeeMonthly !== undefined || account.employerMonthly !== undefined) {
+    return account;
+  }
+  return { ...account, employeeMonthly: account.monthly ?? "", employerMonthly: "" };
+}
 
 export function loadData() {
   try {
@@ -16,7 +29,7 @@ export function loadData() {
           ...parsed.settings?.contributionLimits,
         },
       },
-      accounts: parsed.accounts ?? [],
+      accounts: (parsed.accounts ?? []).map(migrateAccount),
       health: { ...seedData.health, ...parsed.health },
       triggers: parsed.triggers ?? [],
       checklist: { ...seedData.checklist, ...parsed.checklist },
