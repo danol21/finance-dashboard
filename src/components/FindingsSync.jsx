@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   fetchFindings,
   findingRatingToTriggerRating,
@@ -11,49 +11,50 @@ function todayISO() {
 }
 
 export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAddTrigger }) {
-  const [justLogged, setJustLogged] = useState([]);
+  const [findings, setFindings] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [checking, setChecking] = useState(false);
-
-  // Tracks ids already processed this session, updated synchronously so two
-  // overlapping fetches (e.g. React StrictMode's dev-only double effect, or a
-  // fast double click) can't both add the same finding before state re-renders.
-  const processedIdsRef = useRef(new Set(reviewedFindingIds));
-
-  useEffect(() => {
-    reviewedFindingIds.forEach((id) => processedIdsRef.current.add(id));
-  }, [reviewedFindingIds]);
+  // Ids acted on (Add or Dismiss) this session but not yet reflected in the
+  // reviewedFindingIds prop — hides the card immediately and blocks a second
+  // click on the same finding before the state update re-renders.
+  const [pendingIds, setPendingIds] = useState(() => new Set());
 
   const runFetch = async () => {
     setChecking(true);
     const results = await fetchFindings();
-    const newOnes = results.filter((f) => f.id && !processedIdsRef.current.has(f.id));
-    newOnes.forEach((f) => processedIdsRef.current.add(f.id));
-
-    newOnes.forEach((finding) => {
-      onAddTrigger({
-        id: makeId("trig"),
-        date: todayISO(),
-        category: inferCategory(finding),
-        note: [finding.summary, finding.suggestedAction]
-          .filter(Boolean)
-          .join("\n\nSuggested action: "),
-        rating: findingRatingToTriggerRating(finding.rating),
-        resolved: false,
-      });
-      onMarkReviewed(finding.id);
-    });
-
-    if (newOnes.length > 0) {
-      setJustLogged((prev) => [...newOnes, ...prev]);
-    }
+    setFindings(results);
     setChecking(false);
   };
 
   useEffect(() => {
     runFetch();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const newFindings = findings.filter(
+    (f) => f.id && !reviewedFindingIds.includes(f.id) && !pendingIds.has(f.id)
+  );
+
+  const markPending = (id) => {
+    setPendingIds((prev) => new Set(prev).add(id));
+  };
+
+  const addToTriggerLog = (finding) => {
+    markPending(finding.id);
+    onAddTrigger({
+      id: makeId("trig"),
+      date: todayISO(),
+      category: inferCategory(finding),
+      note: [finding.summary, finding.suggestedAction].filter(Boolean).join("\n\nSuggested action: "),
+      rating: findingRatingToTriggerRating(finding.rating),
+      resolved: false,
+    });
+    onMarkReviewed(finding.id);
+  };
+
+  const dismiss = (finding) => {
+    markPending(finding.id);
+    onMarkReviewed(finding.id);
+  };
 
   return (
     <div className="findings-sync">
@@ -66,16 +67,16 @@ export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAdd
         {checking ? "Checking…" : "Check for updates"}
       </button>
 
-      {justLogged.length > 0 && (
+      {newFindings.length > 0 && (
         <button className="sync-banner" onClick={() => setExpanded((e) => !e)} type="button">
-          {justLogged.length} new finding{justLogged.length === 1 ? "" : "s"} from your monthly
-          review — added to your trigger log. Check now
+          {newFindings.length} new finding{newFindings.length === 1 ? "" : "s"} from your monthly
+          review — Check now
         </button>
       )}
 
-      {expanded && justLogged.length > 0 && (
+      {expanded && newFindings.length > 0 && (
         <div className="findings-list">
-          {justLogged.map((f) => (
+          {newFindings.map((f) => (
             <div key={f.id} className="finding-card">
               <div className="finding-card-header">
                 <span className={`rating-badge ${f.rating === "🔴" ? "rating-act" : "rating-watch"}`}>
@@ -96,9 +97,14 @@ export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAdd
                   View source
                 </a>
               )}
-              <p className="finding-logged-note">
-                Added to the trigger log below. Remove or resolve it there if it doesn't apply.
-              </p>
+              <div className="finding-actions">
+                <button className="btn btn-ghost" onClick={() => addToTriggerLog(f)} type="button">
+                  Add to trigger log
+                </button>
+                <button className="btn btn-icon-text" onClick={() => dismiss(f)} type="button">
+                  Dismiss without logging
+                </button>
+              </div>
             </div>
           ))}
         </div>
