@@ -1,0 +1,151 @@
+import { num, formatCurrency, formatCurrencyPrecise } from "../lib/finance";
+import { makeId } from "../lib/storage";
+
+const ACCOUNT_TYPES = [
+  "Brokerage",
+  "Traditional IRA",
+  "Roth IRA",
+  "401(k)",
+  "403(b)",
+  "HSA",
+  "UK Pension",
+  "Cash / Savings",
+  "Other",
+];
+
+export default function AccountsTable({ accounts, onChange }) {
+  const totalBalance = accounts.reduce((sum, a) => sum + num(a.balance), 0);
+  const totalMonthly = accounts.reduce((sum, a) => sum + num(a.monthly), 0);
+
+  const updateRow = (id, field, value) => {
+    onChange(accounts.map((a) => (a.id === id ? { ...a, [field]: value } : a)));
+  };
+
+  const addRow = () => {
+    onChange([
+      ...accounts,
+      {
+        id: makeId("acct"),
+        name: "",
+        institution: "",
+        type: ACCOUNT_TYPES[0],
+        balance: "",
+        monthly: "",
+        notes: "",
+      },
+    ]);
+  };
+
+  const removeRow = (id) => {
+    onChange(accounts.filter((a) => a.id !== id));
+  };
+
+  return (
+    <section className="panel">
+      <div className="panel-header-row">
+        <h2 className="panel-title">Accounts</h2>
+        <button className="btn btn-ghost" onClick={addRow} type="button">
+          + Add account
+        </button>
+      </div>
+
+      <div className="table-scroll">
+        <table className="ledger-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Institution</th>
+              <th>Type</th>
+              <th className="col-num">Balance</th>
+              <th className="col-num">Monthly</th>
+              <th>Notes</th>
+              <th aria-label="Actions"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {accounts.map((a) => (
+              <tr key={a.id}>
+                <td>
+                  <input
+                    className="cell-input"
+                    value={a.name}
+                    onChange={(e) => updateRow(a.id, "name", e.target.value)}
+                    placeholder="Account name"
+                  />
+                </td>
+                <td>
+                  <input
+                    className="cell-input"
+                    value={a.institution}
+                    onChange={(e) => updateRow(a.id, "institution", e.target.value)}
+                    placeholder="Institution"
+                  />
+                </td>
+                <td>
+                  <select
+                    className="cell-input"
+                    value={a.type}
+                    onChange={(e) => updateRow(a.id, "type", e.target.value)}
+                  >
+                    {ACCOUNT_TYPES.map((t) => (
+                      <option key={t} value={t}>
+                        {t}
+                      </option>
+                    ))}
+                  </select>
+                </td>
+                <td className="col-num">
+                  <input
+                    className="cell-input cell-num"
+                    inputMode="decimal"
+                    value={a.balance}
+                    onChange={(e) => updateRow(a.id, "balance", e.target.value)}
+                    placeholder="0.00"
+                  />
+                </td>
+                <td className="col-num">
+                  <input
+                    className="cell-input cell-num"
+                    inputMode="decimal"
+                    value={a.monthly}
+                    onChange={(e) => updateRow(a.id, "monthly", e.target.value)}
+                    placeholder="0.00"
+                  />
+                </td>
+                <td>
+                  <input
+                    className="cell-input"
+                    value={a.notes}
+                    onChange={(e) => updateRow(a.id, "notes", e.target.value)}
+                    placeholder="Notes"
+                  />
+                </td>
+                <td>
+                  <button
+                    className="btn btn-icon"
+                    onClick={() => removeRow(a.id)}
+                    type="button"
+                    aria-label="Remove account"
+                    title="Remove account"
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan={3} className="totals-label">
+                Totals
+              </td>
+              <td className="col-num totals-value">{formatCurrency(totalBalance)}</td>
+              <td className="col-num totals-value">{formatCurrencyPrecise(totalMonthly)}</td>
+              <td colSpan={2}></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </section>
+  );
+}

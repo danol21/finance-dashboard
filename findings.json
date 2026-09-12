@@ -1,0 +1,11 @@
+[
+  {
+    "id": "example-finding-1",
+    "date": "2026-01-01",
+    "source": "Example monthly review",
+    "url": "https://github.com/danol21/finance-dashboard",
+    "rating": "🟡",
+    "summary": "This is a placeholder finding so you can see how the sync banner works end to end.",
+    "suggestedAction": "Replace the contents of this file with real findings from your monthly review, or delete this example entry."
+  }
+]
