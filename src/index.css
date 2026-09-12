@@ -691,6 +691,13 @@ textarea {
   flex-wrap: wrap;
 }
 
+.finding-logged-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 .btn-icon-text {
   background: transparent;
   border-color: var(--border-subtle);
