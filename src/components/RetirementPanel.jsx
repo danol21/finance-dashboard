@@ -1,4 +1,11 @@
-import { num, effectiveMonthly, projectBalance, formatCurrency, formatCurrencyPrecise } from "../lib/finance";
+import {
+  num,
+  effectiveMonthly,
+  isElectiveDeferralType,
+  projectBalance,
+  formatCurrency,
+  formatCurrencyPrecise,
+} from "../lib/finance";
 
 export default function RetirementPanel({ settings, onChange, accounts }) {
   const totalBalance = accounts.reduce((sum, a) => sum + num(a.balance), 0);
@@ -10,11 +17,24 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
   const months = Math.round(yearsToGo * 12);
   const spouseCurrentAge = settings.selfCurrentAge !== "" ? selfAge - num(settings.spouseYoungerBy) : "";
 
+  const employeeMonthly = accounts
+    .filter((a) => isElectiveDeferralType(a.type))
+    .reduce((sum, a) => sum + num(a.employeeMonthly ?? a.monthly), 0);
+  const employerMonthly = accounts
+    .filter((a) => isElectiveDeferralType(a.type))
+    .reduce((sum, a) => sum + num(a.employerMonthly), 0);
+  const otherMonthly = accounts
+    .filter((a) => !isElectiveDeferralType(a.type))
+    .reduce((sum, a) => sum + num(a.monthly), 0);
+
   const projected = projectBalance({
     presentValue: totalBalance,
-    monthlyContribution: totalMonthly,
+    employeeMonthly,
+    employerMonthly,
+    otherMonthly,
     annualRatePct: num(settings.realReturn),
     months,
+    electiveDeferralLimit: num(settings.contributionLimits?.limit401k),
   });
 
   const goal = num(settings.nestEggGoal);
