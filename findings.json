@@ -34,5 +34,23 @@
     "rating": "🟢",
     "summary": "JL Collins reversed a position he'd held publicly for over a decade: he added international equity exposure (moving toward Vanguard's Total World Stock fund/ETF, VTWAX/VT) and shifted part of his holdings to ETFs, departing from the 'just VTSAX, US-only is enough' foundation of the Simple Path to Wealth. This is a structural/philosophical revision to a foundational Simple-Path assumption, not routine fund commentary.",
     "suggestedAction": "No action needed — your FZROX/FTIHX 70/30 taxable brokerage already carries a 30% international allocation, so you're already positioned the way Collins is now moving toward. Logged for reference only."
+  },
+  {
+    "id": "truthifi-idle-cash-tax-advantaged-2026-09",
+    "date": "2026-09-13",
+    "source": "Truthifi live portfolio diagnostic (Monitoring tier) — account composition",
+    "url": "",
+    "rating": "🟡",
+    "summary": "Cash-or-cash-equivalents (money market sweep) made up roughly 18–19% of combined Traditional IRA + Roth IRA value in early September 2026 — notably elevated for a fully-invested 2-fund strategy. This lines up with recent Roth conversions moving cash from the Traditional IRA into the Roth IRA that may not yet be reinvested.",
+    "suggestedAction": "Confirm whether recent Roth-conversion cash has settled and reinvest it per the FZROX/FTIHX target allocation to avoid an unintended cash drag on tax-advantaged growth. Recheck this percentage next month."
+  },
+  {
+    "id": "truthifi-portfolio-alpha-gap-2026-09",
+    "date": "2026-09-13",
+    "source": "Truthifi live findings (Monitoring tier) — PortfolioWithPerformanceBelowBenchmark / ProviderWithPerformanceBelowBenchmark",
+    "url": "",
+    "rating": "🟡",
+    "summary": "Aggregate trailing-12-month portfolio return trailed Truthifi's similarly-allocated benchmark by roughly 36 percentage points. Over the same period the core FZROX/FTIHX/FXAIX holdings each individually ranked in the top quartile of their own fund categories, so the gap appears to trace to the satellite sleeve (QQQ/FBTC/FETH/DBC/GLD) rather than the core 2-fund strategy.",
+    "suggestedAction": "No change to the core FZROX/FTIHX strategy warranted. If the satellite sleeve's volatility/drag is a concern, review its sizing relative to the core holdings next rebalance; otherwise treat this as informational since the benchmark's own allocation may not closely match the satellite sleeve. Track alpha vs. benchmark again next month."
   }
 ]
