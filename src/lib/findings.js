@@ -8,9 +8,13 @@ export function findingRatingToTriggerRating(rating) {
 }
 
 const CATEGORY_KEYWORDS = [
-  { category: "Tax opportunity", pattern: /tax|roth|deduction|withholding|hsa/i },
+  // Checked before Tax opportunity so e.g. "idle cash in your Roth IRA" lands
+  // here rather than matching on "Roth".
+  { category: "Cash management", pattern: /idle cash|cash drag|money market yield|cash sitting|sitting in cash/i },
+  { category: "Performance", pattern: /underperform|outperform|\balpha\b|benchmark/i },
+  { category: "Tax opportunity", pattern: /tax|roth|deduction|withholding|hsa|wash sale/i },
   { category: "Fee review", pattern: /fee|expense ratio|load\b/i },
-  { category: "Rebalance", pattern: /rebalance|allocation|drift/i },
+  { category: "Rebalance", pattern: /rebalance|allocation|drift|concentrat/i },
   { category: "Contribution change", pattern: /contribution|limit|deferral|match/i },
 ];
 

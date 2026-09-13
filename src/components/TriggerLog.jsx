@@ -1,6 +1,14 @@
 import { makeId } from "../lib/storage";
 
-const CATEGORIES = ["Tax opportunity", "Rebalance", "Fee review", "Contribution change", "Other"];
+const CATEGORIES = [
+  "Tax opportunity",
+  "Rebalance",
+  "Fee review",
+  "Contribution change",
+  "Cash management",
+  "Performance",
+  "Other",
+];
 
 const RATINGS = [
   { value: "act", emoji: "🔴", label: "Act now", order: 0, className: "rating-act" },
