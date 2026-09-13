@@ -57,7 +57,7 @@ const SEEDED_REMINDERS = [
     id: "reminder-401k-2027-reset",
     dueDate: "2027-01-01",
     title: "Reset 401(k) contribution % for 2027",
-    note: "Change payroll election back up from the 2026 year-end reduction (1% pre-tax / 1% Roth) to the 2027 target (~11% pre-tax / ~3% Roth, pending IRS confirmation of the 2027 limit) — must be in before the first paycheck of the year on Jan 15, 2027.",
+    note: "Update the 401(k) contribution % directly in the ADP/Voya self-service app — back up from the 2026 year-end reduction (1% pre-tax / 1% Roth) to the 2027 target (~11% pre-tax / ~3% Roth, pending IRS confirmation of the 2027 limit). Must be in before the first paycheck of the year on Jan 15, 2027.",
     completed: false,
   },
   {
