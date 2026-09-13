@@ -28,6 +28,10 @@ export function loadData() {
           ...seedData.settings.contributionLimits,
           ...parsed.settings?.contributionLimits,
         },
+        glidePath: {
+          ...seedData.settings.glidePath,
+          ...parsed.settings?.glidePath,
+        },
       },
       accounts: (parsed.accounts ?? []).map(migrateAccount),
       health: { ...seedData.health, ...parsed.health },

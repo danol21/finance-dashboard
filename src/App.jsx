@@ -6,6 +6,7 @@ import TriggerLog from "./components/TriggerLog";
 import ContributionLimitsPanel from "./components/ContributionLimitsPanel";
 import QuarterlyChecklist from "./components/QuarterlyChecklist";
 import FindingsSync from "./components/FindingsSync";
+import GlidePathPanel from "./components/GlidePathPanel";
 import { loadData, saveData } from "./lib/storage";
 import { seedData } from "./data/seedData";
 
@@ -23,6 +24,8 @@ export default function App() {
   const updateTriggers = (triggers) => setData((d) => ({ ...d, triggers }));
   const updateContributionLimits = (contributionLimits) =>
     setData((d) => ({ ...d, settings: { ...d.settings, contributionLimits } }));
+  const updateGlidePath = (glidePath) =>
+    setData((d) => ({ ...d, settings: { ...d.settings, glidePath } }));
   const updateChecklist = (checklist) => setData((d) => ({ ...d, checklist }));
 
   const addTriggerFromFinding = (entry) =>
@@ -60,6 +63,10 @@ export default function App() {
             contributionLimits: {
               ...seedData.settings.contributionLimits,
               ...parsed.settings?.contributionLimits,
+            },
+            glidePath: {
+              ...seedData.settings.glidePath,
+              ...parsed.settings?.glidePath,
             },
           },
           accounts: parsed.accounts ?? [],
@@ -115,6 +122,11 @@ export default function App() {
           settings={data.settings}
           onChange={updateSettings}
           accounts={data.accounts}
+        />
+        <GlidePathPanel
+          settings={data.settings}
+          glidePath={data.settings.glidePath}
+          onChange={updateGlidePath}
         />
         <AccountsTable accounts={data.accounts} onChange={updateAccounts} />
         <ContributionLimitsPanel

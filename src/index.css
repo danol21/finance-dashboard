@@ -740,3 +740,48 @@ textarea {
   color: var(--text-muted);
   font-style: italic;
 }
+
+/* Glide path */
+.glide-grid {
+  margin-bottom: 1.5rem;
+}
+
+.glide-chart-frame {
+  background: var(--ink-navy);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.75rem;
+  overflow-x: auto;
+}
+
+.glide-chart-frame svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-width: 560px;
+}
+
+.glide-axis-label {
+  font-size: 11px;
+  fill: var(--text-muted);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+.glide-marker-label {
+  font-size: 11px;
+  fill: var(--text-secondary);
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+}
+
+.glide-marker-today {
+  fill: var(--text-secondary);
+  font-style: italic;
+}
+
+.glide-caption {
+  margin: 0.9rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  max-width: 72ch;
+}

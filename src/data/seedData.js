@@ -11,6 +11,13 @@ export const seedData = {
     withdrawalRate: 4.0,
     annualSpending: "",
     lastStructuralReview: "",
+    glidePath: {
+      deRiskStartAge: 54,
+      preEquity: 90,
+      troughEquity: 60,
+      driftEndAge: 75,
+      postEquity: 75,
+    },
     contributionLimits: {
       limit401k: 24500,
       limitIRA: 7500,

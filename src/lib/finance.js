@@ -61,6 +61,31 @@ export function projectBalance({
   return balance;
 }
 
+/**
+ * Bond-tent glide path: flat at `preEquity` until `deRiskStartAge`, declines
+ * linearly to `troughEquity` at `retirementAge` (the tent's trough), then
+ * rises linearly back to `postEquity` by `driftEndAge`, flat afterward.
+ */
+export function equityAllocationAt(age, glidePath, retirementAge) {
+  const { deRiskStartAge, preEquity, troughEquity, driftEndAge, postEquity } = glidePath;
+
+  if (age <= deRiskStartAge) return preEquity;
+
+  if (age <= retirementAge) {
+    const span = Math.max(retirementAge - deRiskStartAge, 1);
+    const t = (age - deRiskStartAge) / span;
+    return preEquity + (troughEquity - preEquity) * t;
+  }
+
+  if (age <= driftEndAge) {
+    const span = Math.max(driftEndAge - retirementAge, 1);
+    const t = (age - retirementAge) / span;
+    return troughEquity + (postEquity - troughEquity) * t;
+  }
+
+  return postEquity;
+}
+
 export function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
