@@ -73,6 +73,7 @@ export const seedData = {
     "Contribution room": { completed: false, lastCompleted: "" },
   },
   reviewedFindingIds: [],
+  reminders: [],
   // Contribution rates for accounts synced from the Live Portfolio Snapshot,
   // keyed by the synced account's Truthifi accountId. Balances and holdings for
   // those accounts come from the snapshot itself and are never stored here —

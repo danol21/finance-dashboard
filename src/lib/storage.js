@@ -49,6 +49,25 @@ function migrateTrigger(trigger) {
   };
 }
 
+// One-time seeded reminders, inserted if not already present (matched by id,
+// so a user who deletes one won't have it silently reappear — deleting IS the
+// "I've handled this" action for a reminder).
+const SEEDED_REMINDERS = [
+  {
+    id: "reminder-401k-2027-reset",
+    dueDate: "2027-01-01",
+    title: "Reset 401(k) contribution % for 2027",
+    note: "Change payroll election back up from the 2026 year-end reduction (1% pre-tax / 1% Roth) to the 2027 target (~11% pre-tax / ~3% Roth, pending IRS confirmation of the 2027 limit) — must be in before the first paycheck of the year on Jan 15, 2027.",
+    completed: false,
+  },
+];
+
+function ensureSeededReminders(reminders) {
+  const existingIds = new Set(reminders.map((r) => r.id));
+  const toAdd = SEEDED_REMINDERS.filter((r) => !existingIds.has(r.id));
+  return [...reminders, ...toAdd];
+}
+
 export function loadData() {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
@@ -73,6 +92,7 @@ export function loadData() {
       checklist: { ...seedData.checklist, ...parsed.checklist },
       reviewedFindingIds: parsed.reviewedFindingIds ?? [],
       syncedContributions: { ...seedData.syncedContributions, ...parsed.syncedContributions },
+      reminders: ensureSeededReminders(parsed.reminders ?? []),
     };
   } catch (err) {
     console.error("Failed to load saved data, falling back to seed.", err);

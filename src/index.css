@@ -771,6 +771,90 @@ textarea {
   font-style: italic;
 }
 
+/* Reminders */
+.reminders-panel {
+  border-color: var(--gold);
+}
+
+.reminders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.reminder-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  background: var(--ink-navy);
+  border-radius: 8px;
+  padding: 0.7rem 0.9rem;
+  border-left: 3px solid var(--text-muted);
+}
+
+.reminder-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.reminder-title {
+  font-weight: 600;
+}
+
+.reminder-note {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.reminder-due {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.reminder-done-btn {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+}
+
+.reminder-later {
+  border-left-color: var(--status-ok);
+}
+
+.reminder-soon {
+  border-left-color: var(--status-watch);
+}
+
+.reminder-soon .reminder-due {
+  color: var(--status-watch);
+  font-weight: 600;
+}
+
+.reminder-overdue {
+  border-left-color: var(--status-flagged);
+  background: rgba(181, 103, 90, 0.08);
+}
+
+.reminder-overdue .reminder-due {
+  color: var(--status-flagged);
+  font-weight: 700;
+}
+
+.reminder-add-form {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+@media (max-width: 720px) {
+  .reminder-row {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Live snapshot login */
 .snapshot-login {
   display: flex;

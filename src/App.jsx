@@ -6,6 +6,7 @@ import TriggerLog from "./components/TriggerLog";
 import ContributionLimitsPanel from "./components/ContributionLimitsPanel";
 import QuarterlyChecklist from "./components/QuarterlyChecklist";
 import FindingsSync from "./components/FindingsSync";
+import RemindersPanel from "./components/RemindersPanel";
 import GlidePathPanel from "./components/GlidePathPanel";
 import FundFeePanel from "./components/FundFeePanel";
 import LiveSnapshotPanel from "./components/LiveSnapshotPanel";
@@ -97,6 +98,7 @@ export default function App() {
   const updateGlidePath = (glidePath) =>
     setData((d) => ({ ...d, settings: { ...d.settings, glidePath } }));
   const updateChecklist = (checklist) => setData((d) => ({ ...d, checklist }));
+  const updateReminders = (reminders) => setData((d) => ({ ...d, reminders }));
 
   const addTriggerFromFinding = (entry) =>
     setData((d) => ({ ...d, triggers: [entry, ...d.triggers] }));
@@ -145,6 +147,7 @@ export default function App() {
           checklist: { ...seedData.checklist, ...parsed.checklist },
           reviewedFindingIds: parsed.reviewedFindingIds ?? data.reviewedFindingIds,
           syncedContributions: { ...data.syncedContributions, ...parsed.syncedContributions },
+          reminders: parsed.reminders ?? data.reminders,
         });
       } catch (err) {
         alert("Could not parse that file as JSON.");
@@ -184,6 +187,7 @@ export default function App() {
       </header>
 
       <main className="app-main">
+        <RemindersPanel reminders={data.reminders} onChange={updateReminders} />
         <FindingsSync
           reviewedFindingIds={data.reviewedFindingIds}
           onMarkReviewed={markFindingReviewed}
