@@ -7,6 +7,7 @@ import ContributionLimitsPanel from "./components/ContributionLimitsPanel";
 import QuarterlyChecklist from "./components/QuarterlyChecklist";
 import FindingsSync from "./components/FindingsSync";
 import GlidePathPanel from "./components/GlidePathPanel";
+import FundFeePanel from "./components/FundFeePanel";
 import { loadData, saveData } from "./lib/storage";
 import { seedData } from "./data/seedData";
 
@@ -69,11 +70,11 @@ export default function App() {
               ...parsed.settings?.glidePath,
             },
           },
-          accounts: parsed.accounts ?? [],
+          accounts: parsed.accounts ?? data.accounts,
           health: { ...data.health, ...parsed.health },
-          triggers: parsed.triggers ?? [],
+          triggers: parsed.triggers ?? data.triggers,
           checklist: { ...seedData.checklist, ...parsed.checklist },
-          reviewedFindingIds: parsed.reviewedFindingIds ?? [],
+          reviewedFindingIds: parsed.reviewedFindingIds ?? data.reviewedFindingIds,
         });
       } catch (err) {
         alert("Could not parse that file as JSON.");
@@ -129,6 +130,7 @@ export default function App() {
           onChange={updateGlidePath}
         />
         <AccountsTable accounts={data.accounts} onChange={updateAccounts} />
+        <FundFeePanel accounts={data.accounts} settings={data.settings} />
         <ContributionLimitsPanel
           limits={data.settings.contributionLimits}
           accounts={data.accounts}

@@ -29,6 +29,7 @@ export default function AccountsTable({ accounts, onChange }) {
         name: "",
         institution: "",
         type: ACCOUNT_TYPES[0],
+        fund: "",
         balance: "",
         monthly: "",
         notes: "",
@@ -56,6 +57,7 @@ export default function AccountsTable({ accounts, onChange }) {
               <th>Name</th>
               <th>Institution</th>
               <th>Type</th>
+              <th>Fund</th>
               <th className="col-num">Balance</th>
               <th className="col-num">Monthly</th>
               <th>Notes</th>
@@ -93,6 +95,15 @@ export default function AccountsTable({ accounts, onChange }) {
                       </option>
                     ))}
                   </select>
+                </td>
+                <td>
+                  <input
+                    className="cell-input"
+                    value={a.fund ?? ""}
+                    onChange={(e) => updateRow(a.id, "fund", e.target.value.toUpperCase())}
+                    placeholder="e.g. FZROX"
+                    title="Ticker of the fund held in this account, for the Fund & Fee Review panel"
+                  />
                 </td>
                 <td className="col-num">
                   <input
@@ -163,7 +174,7 @@ export default function AccountsTable({ accounts, onChange }) {
           </tbody>
           <tfoot>
             <tr>
-              <td colSpan={3} className="totals-label">
+              <td colSpan={4} className="totals-label">
                 Totals
               </td>
               <td className="col-num totals-value">{formatCurrency(totalBalance)}</td>

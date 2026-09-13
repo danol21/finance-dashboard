@@ -86,6 +86,28 @@ export function equityAllocationAt(age, glidePath, retirementAge) {
   return postEquity;
 }
 
+export function annualFeeCost(balance, expenseRatioPct) {
+  return balance * (expenseRatioPct / 100);
+}
+
+// Dollar impact by a target date of a change in ongoing expense-ratio drag,
+// modeled as a real-return adjustment (fee savings compound like extra return)
+// applied to the affected balance only.
+export function feeSavingsImpact({ presentValue, monthlyContribution = 0, months, annualRatePct, feeDeltaPct }) {
+  if (months <= 0) return 0;
+  const project = (rate) =>
+    projectBalance({
+      presentValue,
+      employeeMonthly: 0,
+      employerMonthly: 0,
+      otherMonthly: monthlyContribution,
+      annualRatePct: rate,
+      months,
+      electiveDeferralLimit: 0,
+    });
+  return project(annualRatePct + feeDeltaPct) - project(annualRatePct);
+}
+
 export function formatCurrency(value) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",

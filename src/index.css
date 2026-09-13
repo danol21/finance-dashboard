@@ -741,6 +741,104 @@ textarea {
   font-style: italic;
 }
 
+/* Fund & fee review */
+.fund-caption {
+  margin: -0.5rem 0 1.25rem;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  max-width: 72ch;
+}
+
+.fund-holdings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.fund-row {
+  display: grid;
+  grid-template-columns: 90px 1fr 160px 90px 110px;
+  gap: 0.6rem;
+  align-items: center;
+  background: var(--ink-navy);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.85rem;
+}
+
+.fund-ticker {
+  font-family: "Spectral", Georgia, serif;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+.fund-account {
+  color: var(--text-secondary);
+}
+
+.fund-er,
+.fund-fee {
+  text-align: right;
+  font-family: "Spectral", Georgia, serif;
+}
+
+.fund-opportunities {
+  margin-top: 1.5rem;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.fund-opportunities-title {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--gold);
+}
+
+.fund-opportunity-card {
+  background: var(--ink-navy);
+  border: 1px solid var(--gold-soft);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fund-opportunity-summary,
+.fund-opportunity-impact,
+.fund-opportunity-caveat {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.fund-opportunity-caveat {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.impact-positive {
+  color: var(--status-ok);
+}
+
+@media (max-width: 720px) {
+  .fund-row {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+  .fund-er,
+  .fund-fee {
+    text-align: left;
+  }
+}
+
 /* Glide path */
 .glide-grid {
   margin-bottom: 1.5rem;
