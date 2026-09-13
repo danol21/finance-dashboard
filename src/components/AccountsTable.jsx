@@ -13,9 +13,10 @@ const ACCOUNT_TYPES = [
   "Other",
 ];
 
-export default function AccountsTable({ accounts, onChange }) {
-  const totalBalance = accounts.reduce((sum, a) => sum + num(a.balance), 0);
-  const totalMonthly = accounts.reduce((sum, a) => sum + effectiveMonthly(a), 0);
+export default function AccountsTable({ accounts, onChange, syncedAccounts = [], onUpdateSyncedContribution }) {
+  const allRows = [...accounts, ...syncedAccounts];
+  const totalBalance = allRows.reduce((sum, a) => sum + num(a.balance), 0);
+  const totalMonthly = allRows.reduce((sum, a) => sum + effectiveMonthly(a), 0);
 
   const updateRow = (id, field, value) => {
     onChange(accounts.map((a) => (a.id === id ? { ...a, [field]: value } : a)));
@@ -49,6 +50,15 @@ export default function AccountsTable({ accounts, onChange }) {
           + Add account
         </button>
       </div>
+
+      {syncedAccounts.length > 0 && (
+        <p className="fund-caption">
+          Accounts synced from your Live Portfolio Snapshot appear below (grayed out) with their
+          balance and fund managed automatically — enter their monthly contribution here since
+          Truthifi can't see that. Manually-added accounts with the same name are hidden to avoid
+          double-counting.
+        </p>
+      )}
 
       <div className="table-scroll">
         <table className="ledger-table">
@@ -169,6 +179,65 @@ export default function AccountsTable({ accounts, onChange }) {
                     ✕
                   </button>
                 </td>
+              </tr>
+            ))}
+            {syncedAccounts.map((a) => (
+              <tr key={a.id} className="ledger-row-synced">
+                <td>
+                  <input className="cell-input" value={a.name} disabled title="Synced via Truthifi" />
+                </td>
+                <td>
+                  <input className="cell-input" value={a.institution} disabled />
+                </td>
+                <td>
+                  <input className="cell-input" value={a.type} disabled />
+                </td>
+                <td>
+                  <input className="cell-input" value={a.fund} disabled title={a.fund} />
+                </td>
+                <td className="col-num">
+                  <input className="cell-input cell-num" value={formatCurrencyPrecise(num(a.balance))} disabled />
+                </td>
+                <td className="col-num">
+                  {isElectiveDeferralType(a.type) ? (
+                    <div className="split-monthly">
+                      <div className="split-monthly-row">
+                        <span className="split-monthly-label">EE</span>
+                        <input
+                          className="cell-input cell-num"
+                          inputMode="decimal"
+                          value={a.employeeMonthly ?? ""}
+                          onChange={(e) => onUpdateSyncedContribution(a.accountId, "employeeMonthly", e.target.value)}
+                          placeholder="0.00"
+                          title="Employee contribution (pre-tax + Roth)"
+                        />
+                      </div>
+                      <div className="split-monthly-row">
+                        <span className="split-monthly-label">ER</span>
+                        <input
+                          className="cell-input cell-num"
+                          inputMode="decimal"
+                          value={a.employerMonthly ?? ""}
+                          onChange={(e) => onUpdateSyncedContribution(a.accountId, "employerMonthly", e.target.value)}
+                          placeholder="0.00"
+                          title="Employer match / Safe Harbor"
+                        />
+                      </div>
+                    </div>
+                  ) : (
+                    <input
+                      className="cell-input cell-num"
+                      inputMode="decimal"
+                      value={a.monthly ?? ""}
+                      onChange={(e) => onUpdateSyncedContribution(a.accountId, "monthly", e.target.value)}
+                      placeholder="0.00"
+                    />
+                  )}
+                </td>
+                <td>
+                  <input className="cell-input" value={a.notes} disabled title={a.notes} />
+                </td>
+                <td />
               </tr>
             ))}
           </tbody>

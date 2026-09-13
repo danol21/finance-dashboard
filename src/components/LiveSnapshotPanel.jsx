@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { formatCurrency, formatCurrencyPrecise } from "../lib/finance";
 
 function formatSyncedAt(iso) {
@@ -6,67 +6,22 @@ function formatSyncedAt(iso) {
   return new Date(iso).toLocaleString();
 }
 
-export default function LiveSnapshotPanel() {
-  const [status, setStatus] = useState("loading"); // loading | unavailable | needs-login | ready
-  const [snapshot, setSnapshot] = useState(null);
+export default function LiveSnapshotPanel({ status, snapshot, onLogin, onLogout }) {
   const [password, setPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [loggingIn, setLoggingIn] = useState(false);
-
-  const fetchSnapshot = async () => {
-    try {
-      const res = await fetch("/api/snapshot", { credentials: "include" });
-      if (res.status === 401) {
-        setStatus("needs-login");
-        return;
-      }
-      if (!res.ok) {
-        setStatus("unavailable");
-        return;
-      }
-      const data = await res.json();
-      setSnapshot(data);
-      setStatus("ready");
-    } catch {
-      // Most likely running `npm run dev` locally, where /api routes don't
-      // exist — this feature only works on the deployed Vercel site.
-      setStatus("unavailable");
-    }
-  };
-
-  useEffect(() => {
-    fetchSnapshot();
-  }, []);
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoggingIn(true);
     setLoginError("");
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        setLoginError(body.error ?? "Login failed");
-        return;
-      }
+    const result = await onLogin(password);
+    if (result.ok) {
       setPassword("");
-      await fetchSnapshot();
-    } catch {
-      setLoginError("Could not reach the server.");
-    } finally {
-      setLoggingIn(false);
+    } else {
+      setLoginError(result.error ?? "Login failed");
     }
-  };
-
-  const handleLogout = async () => {
-    await fetch("/api/logout", { method: "POST", credentials: "include" }).catch(() => {});
-    setSnapshot(null);
-    setStatus("needs-login");
+    setLoggingIn(false);
   };
 
   if (status === "loading") return null;
@@ -88,7 +43,8 @@ export default function LiveSnapshotPanel() {
       <section className="panel">
         <h2 className="panel-title">Live Portfolio Snapshot</h2>
         <p className="fund-caption">
-          Sign in to view the latest synced balances and diagnostics from Truthifi.
+          Sign in to view the latest synced balances and diagnostics from Truthifi, and to feed
+          them into your Retirement Projection and Fund &amp; Fee Review below.
         </p>
         <form className="snapshot-login" onSubmit={handleLogin}>
           <input
@@ -113,7 +69,7 @@ export default function LiveSnapshotPanel() {
       <section className="panel">
         <div className="panel-header-row">
           <h2 className="panel-title">Live Portfolio Snapshot</h2>
-          <button className="btn btn-ghost" onClick={handleLogout} type="button">
+          <button className="btn btn-ghost" onClick={onLogout} type="button">
             Sign out
           </button>
         </div>
@@ -130,11 +86,14 @@ export default function LiveSnapshotPanel() {
     <section className="panel">
       <div className="panel-header-row">
         <h2 className="panel-title">Live Portfolio Snapshot</h2>
-        <button className="btn btn-ghost" onClick={handleLogout} type="button">
+        <button className="btn btn-ghost" onClick={onLogout} type="button">
           Sign out
         </button>
       </div>
-      <p className="fund-caption">Last synced {formatSyncedAt(syncedAt)}</p>
+      <p className="fund-caption">
+        Last synced {formatSyncedAt(syncedAt)} — balances below now feed your Retirement Projection
+        and Fund &amp; Fee Review automatically.
+      </p>
 
       {(diagnostics.idleCashPct !== undefined ||
         diagnostics.alphaVsBenchmarkPct !== undefined ||

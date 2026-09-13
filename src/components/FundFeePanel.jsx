@@ -1,20 +1,29 @@
 import { num, annualFeeCost, feeSavingsImpact, formatCurrency, formatCurrencyPrecise } from "../lib/finance";
 import { findFund, cheapestInCategory } from "../data/fundLibrary";
 
-export default function FundFeePanel({ accounts, settings }) {
+export default function FundFeePanel({ accounts, snapshotHoldings = [], settings }) {
   const selfAge = num(settings.selfCurrentAge);
   const targetAge = num(settings.targetAge);
   const months = Math.max(Math.round((targetAge - selfAge) * 12), 0);
 
-  const rows = accounts
-    .map((a) => ({ account: a, fund: findFund(a.fund) }))
-    .filter((r) => r.fund && num(r.account.balance) > 0);
+  // Manual accounts carry one fund ticker each; synced accounts can hold many
+  // funds, so those come in pre-exploded to one row per holding.
+  const manualRows = accounts
+    .filter((a) => !a.synced && a.fund)
+    .map((a) => ({ id: a.id, ticker: a.fund, balance: num(a.balance), label: a.name || a.type }));
+  const syncedRows = snapshotHoldings.map((h) => ({
+    id: h.id,
+    ticker: h.symbol,
+    balance: h.balance,
+    label: h.accountLabel,
+  }));
 
-  const totalTaggedBalance = rows.reduce((sum, r) => sum + num(r.account.balance), 0);
-  const totalAnnualFee = rows.reduce(
-    (sum, r) => sum + annualFeeCost(num(r.account.balance), r.fund.expenseRatio),
-    0
-  );
+  const rows = [...manualRows, ...syncedRows]
+    .map((r) => ({ row: r, fund: findFund(r.ticker) }))
+    .filter((r) => r.fund && r.row.balance > 0);
+
+  const totalTaggedBalance = rows.reduce((sum, r) => sum + r.row.balance, 0);
+  const totalAnnualFee = rows.reduce((sum, r) => sum + annualFeeCost(r.row.balance, r.fund.expenseRatio), 0);
   const blendedER = totalTaggedBalance > 0 ? (totalAnnualFee / totalTaggedBalance) * 100 : 0;
 
   const opportunities = rows
@@ -23,7 +32,7 @@ export default function FundFeePanel({ accounts, settings }) {
       if (!cheapest || cheapest.expenseRatio >= r.fund.expenseRatio) return null;
       const feeDeltaPct = r.fund.expenseRatio - cheapest.expenseRatio;
       const impact = feeSavingsImpact({
-        presentValue: num(r.account.balance),
+        presentValue: r.row.balance,
         months,
         annualRatePct: num(settings.realReturn),
         feeDeltaPct,
@@ -64,13 +73,13 @@ export default function FundFeePanel({ accounts, settings }) {
 
           <div className="fund-holdings">
             {rows.map((r) => (
-              <div key={r.account.id} className="fund-row">
+              <div key={r.row.id} className="fund-row">
                 <span className="fund-ticker">{r.fund.ticker}</span>
                 <span className="fund-name">{r.fund.name}</span>
-                <span className="fund-account">{r.account.name || r.account.type}</span>
+                <span className="fund-account">{r.row.label}</span>
                 <span className="fund-er">{r.fund.expenseRatio.toFixed(3)}% ER</span>
                 <span className="fund-fee">
-                  {formatCurrencyPrecise(annualFeeCost(num(r.account.balance), r.fund.expenseRatio))}/yr
+                  {formatCurrencyPrecise(annualFeeCost(r.row.balance, r.fund.expenseRatio))}/yr
                 </span>
               </div>
             ))}
@@ -80,9 +89,9 @@ export default function FundFeePanel({ accounts, settings }) {
             <div className="fund-opportunities">
               <h3 className="fund-opportunities-title">Cheaper equivalents available</h3>
               {opportunities.map((o) => (
-                <div key={o.account.id} className="fund-opportunity-card">
+                <div key={o.row.id} className="fund-opportunity-card">
                   <p className="fund-opportunity-summary">
-                    <strong>{o.account.name || o.account.type}</strong> holds{" "}
+                    <strong>{o.row.label}</strong> holds{" "}
                     <strong>{o.fund.ticker}</strong> ({o.fund.expenseRatio.toFixed(3)}% ER). A
                     same-category fund, <strong>{o.cheapest.ticker}</strong> ({o.cheapest.name}),
                     runs {o.cheapest.expenseRatio.toFixed(3)}% ER — {o.feeDeltaPct.toFixed(3)} pts

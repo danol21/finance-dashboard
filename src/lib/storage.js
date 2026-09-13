@@ -72,6 +72,7 @@ export function loadData() {
       triggers: (parsed.triggers ?? []).map(migrateTrigger),
       checklist: { ...seedData.checklist, ...parsed.checklist },
       reviewedFindingIds: parsed.reviewedFindingIds ?? [],
+      syncedContributions: { ...seedData.syncedContributions, ...parsed.syncedContributions },
     };
   } catch (err) {
     console.error("Failed to load saved data, falling back to seed.", err);

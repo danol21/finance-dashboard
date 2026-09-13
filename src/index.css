@@ -315,6 +315,13 @@ textarea {
   font-family: "Spectral", Georgia, serif;
 }
 
+.ledger-row-synced .cell-input:disabled {
+  color: var(--text-muted);
+  background: var(--ink-navy);
+  opacity: 0.85;
+  cursor: default;
+}
+
 .split-monthly {
   display: flex;
   flex-direction: column;
