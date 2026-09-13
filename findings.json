@@ -52,5 +52,14 @@
     "rating": "🟡",
     "summary": "Aggregate trailing-12-month portfolio return trailed Truthifi's similarly-allocated benchmark by roughly 36 percentage points. Over the same period the core FZROX/FTIHX/FXAIX holdings each individually ranked in the top quartile of their own fund categories, so the gap appears to trace to the satellite sleeve (QQQ/FBTC/FETH/DBC/GLD) rather than the core 2-fund strategy.",
     "suggestedAction": "No change to the core FZROX/FTIHX strategy warranted. If the satellite sleeve's volatility/drag is a concern, review its sizing relative to the core holdings next rebalance; otherwise treat this as informational since the benchmark's own allocation may not closely match the satellite sleeve. Track alpha vs. benchmark again next month."
+  },
+  {
+    "id": "401k-safe-harbor-trueup-check-2026-09",
+    "date": "2026-09-13",
+    "source": "Analysis of employer pay stub + Truthifi transaction history",
+    "url": "",
+    "rating": "🟡",
+    "summary": "Employee 401(k) elective deferrals are on pace to reach the annual IRS limit within the next 1-2 pay periods — well ahead of year-end — driven partly by a variable annual bonus (paid quarterly) that also has 401(k) withheld. Reaching the cap early causes employee deferrals to stop for the rest of the year. If the plan's employer Safe Harbor match is calculated per-pay-period rather than trued-up annually, this is a well-documented 401(k) mechanics pitfall: stopping contributions early can forfeit employer match for every remaining pay period of the year.",
+    "suggestedAction": "Confirm with HR or the plan administrator (via the Summary Plan Description) whether the Safe Harbor match includes an annual true-up provision. If yes, no action needed — the employer will true up the match after year-end. If no, consider reducing the per-paycheck contribution percentage next year so contributions spread evenly across all pay periods instead of maxing out early."
   }
 ]
