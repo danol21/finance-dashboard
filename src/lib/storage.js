@@ -60,6 +60,13 @@ const SEEDED_REMINDERS = [
     note: "Change payroll election back up from the 2026 year-end reduction (1% pre-tax / 1% Roth) to the 2027 target (~11% pre-tax / ~3% Roth, pending IRS confirmation of the 2027 limit) — must be in before the first paycheck of the year on Jan 15, 2027.",
     completed: false,
   },
+  {
+    id: "reminder-nov15-bonus-401k-check",
+    dueDate: "2026-11-16",
+    title: "Recheck 401(k) pacing after the Nov 15 bonus paycheck",
+    note: "The Q3 bonus lands on this check. At the current 1% pre-tax / 1% Roth election, confirm the bonus's own 401(k) withholding hasn't pushed YTD elective deferrals close enough to the $24,500 cap to risk losing Safe Harbor match on the Dec 15/31 checks — adjust December down if needed.",
+    completed: false,
+  },
 ];
 
 function ensureSeededReminders(reminders) {
