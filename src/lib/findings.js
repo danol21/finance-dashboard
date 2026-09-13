@@ -1,7 +1,7 @@
 export const FINDINGS_URL =
   "https://raw.githubusercontent.com/danol21/finance-dashboard/main/findings.json";
 
-const RATING_MAP = { "🔴": "act", "🟡": "watch" };
+const RATING_MAP = { "🔴": "act", "🟡": "watch", "🟢": "none" };
 
 export function findingRatingToTriggerRating(rating) {
   return RATING_MAP[rating] ?? "watch";
