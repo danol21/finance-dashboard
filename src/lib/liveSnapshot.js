@@ -31,7 +31,13 @@ export function deriveSyncedAccounts(snapshot, syncedContributions = {}) {
     const holdings = account.holdings ?? [];
     const totalBalance = holdings.reduce((sum, h) => sum + (h.balance ?? 0), 0);
     const type = inferAccountType(account.name);
-    const contribution = syncedContributions[account.accountId] ?? {};
+    // The monthly automation derives a contribution estimate from recent
+    // transaction history where the pattern is regular enough to trust (see
+    // the routine prompt) — a manual override in the Accounts table, if the
+    // user sets one, always wins over that estimate.
+    const autoContribution = snapshot.contributions?.[account.accountId] ?? {};
+    const manualOverride = syncedContributions[account.accountId] ?? {};
+    const contribution = { ...autoContribution, ...manualOverride };
     const fundSummary = holdings
       .map((h) => h.symbol)
       .filter(Boolean)
@@ -45,7 +51,7 @@ export function deriveSyncedAccounts(snapshot, syncedContributions = {}) {
       type,
       fund: fundSummary,
       balance: String(totalBalance),
-      notes: `Synced automatically — ${holdings.length} holding${holdings.length === 1 ? "" : "s"}. Balance and fund come from Truthifi; contribution amount is yours to maintain.`,
+      notes: `Synced automatically — ${holdings.length} holding${holdings.length === 1 ? "" : "s"}. Balance and fund come from Truthifi; contribution amount is auto-estimated monthly from transaction history where the pattern is regular, and always overridable here.`,
       synced: true,
     };
 
