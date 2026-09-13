@@ -8,6 +8,7 @@ import QuarterlyChecklist from "./components/QuarterlyChecklist";
 import FindingsSync from "./components/FindingsSync";
 import GlidePathPanel from "./components/GlidePathPanel";
 import FundFeePanel from "./components/FundFeePanel";
+import LiveSnapshotPanel from "./components/LiveSnapshotPanel";
 import { loadData, saveData } from "./lib/storage";
 import { seedData } from "./data/seedData";
 
@@ -119,6 +120,7 @@ export default function App() {
           onMarkReviewed={markFindingReviewed}
           onAddTrigger={addTriggerFromFinding}
         />
+        <LiveSnapshotPanel />
         <RetirementPanel
           settings={data.settings}
           onChange={updateSettings}

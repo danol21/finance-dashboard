@@ -10,6 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@upstash/redis": "^1.38.4",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

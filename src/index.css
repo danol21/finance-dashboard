@@ -764,6 +764,24 @@ textarea {
   font-style: italic;
 }
 
+/* Live snapshot login */
+.snapshot-login {
+  display: flex;
+  gap: 0.6rem;
+  max-width: 320px;
+}
+
+.snapshot-login .cell-input {
+  border-color: var(--border-subtle);
+  background: var(--ink-navy);
+}
+
+.snapshot-login-error {
+  margin: 0.6rem 0 0;
+  font-size: 0.8rem;
+  color: var(--status-flagged);
+}
+
 /* Fund & fee review */
 .fund-caption {
   margin: -0.5rem 0 1.25rem;
