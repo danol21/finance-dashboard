@@ -14,8 +14,16 @@ const CATEGORY_KEYWORDS = [
   { category: "Contribution change", pattern: /contribution|limit|deferral|match/i },
 ];
 
+// A finding sourced from general research/analysis (a synthesis of ideas, not a
+// specific fund, account, or rebalance action) should land in "Other" even if
+// its summary happens to use portfolio-jargon words like "drift" or
+// "allocation" in a non-actionable sense (e.g. describing a glide path).
+const RESEARCH_SOURCE_PATTERN = /research|analysis|synthesis/i;
+
 export function inferCategory(finding) {
-  const haystack = `${finding.source ?? ""} ${finding.summary ?? ""} ${finding.suggestedAction ?? ""}`;
+  const source = finding.source ?? "";
+  if (RESEARCH_SOURCE_PATTERN.test(source)) return "Other";
+  const haystack = `${source} ${finding.summary ?? ""} ${finding.suggestedAction ?? ""}`;
   const hit = CATEGORY_KEYWORDS.find(({ pattern }) => pattern.test(haystack));
   return hit ? hit.category : "Other";
 }

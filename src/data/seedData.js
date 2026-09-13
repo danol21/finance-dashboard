@@ -48,7 +48,11 @@ export const seedData = {
   ],
   health: {
     "Fee drag": { status: "ok", note: "", updated: "" },
-    "Allocation drift": { status: "ok", note: "", updated: "" },
+    "Allocation drift": {
+      status: "watch",
+      note: "Glide path: bond tent, not linear decline. Begin de-risking at 54–55 to reach ~60/40 stocks/bonds at retirement (60) — tent troughs at the retirement date, which is why build-up starts ~5 years early. Post-retirement, drift back up to 70–80% equity by the mid-70s as the bond floor is spent down. Build the bond sleeve inside the 401(k) to avoid realizing gains in the taxable brokerage. Revisit specifics at 54–55, 58, and 60 based on CAPE valuation at that time.",
+      updated: "2026-09-13",
+    },
     "Tax efficiency": { status: "ok", note: "", updated: "" },
     "Contribution room": { status: "ok", note: "", updated: "" },
   },
