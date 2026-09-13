@@ -26,7 +26,9 @@ const CATEGORY_FIXUPS = [
   {
     fromCategory: "Tax opportunity",
     toCategory: "Cash management",
-    noteStartsWith: "Cash-or-cash-equivalents (money market sweep)",
+    noteStartsWith: "Cash-or-cash-equivalents (money market sweep) made up roughly 18",
+    replaceNote:
+      "Updated 2026-09-13: after linking the 401(k), cash-or-cash-equivalents (money market sweep) make up roughly 4.5% of combined tax-advantaged value (Traditional IRA + Roth IRA + 401(k)) — down from an initial ~18-19% estimate that only saw the two Fidelity IRAs, since the 401(k) is fully invested. The underlying issue is unchanged: the Traditional IRA is still 100% cash and a meaningful slice of the Roth IRA is uninvested cash from recent Roth conversions.\n\nSuggested action: Confirm whether recent Roth-conversion cash has settled and reinvest it per the FZROX/FTIHX target allocation. Now a lower-priority item given the diluted overall percentage, but still worth clearing since it's uninvested tax-advantaged space. Recheck next month.",
   },
   {
     fromCategory: "Rebalance",
@@ -39,7 +41,12 @@ function migrateTrigger(trigger) {
   const fixup = CATEGORY_FIXUPS.find(
     (f) => trigger.category === f.fromCategory && (trigger.note ?? "").startsWith(f.noteStartsWith)
   );
-  return fixup ? { ...trigger, category: fixup.toCategory } : trigger;
+  if (!fixup) return trigger;
+  return {
+    ...trigger,
+    category: fixup.toCategory,
+    note: fixup.replaceNote ?? trigger.note,
+  };
 }
 
 export function loadData() {
