@@ -16,5 +16,14 @@
     "rating": "🟡",
     "summary": "On August 12, 2026 the IRS released Notice 2026-49, proposing sample forms and standardized procedures for rollovers between employer retirement plans and IRAs under SECURE 2.0 Section 324 (IRA-to-IRA transfers aren't covered). It's still a draft: the IRS is taking public comments through October 23, 2026, so nothing is final or mandatory yet.",
     "suggestedAction": "No action needed now. When you eventually roll your 401(k)/403(b) over to an IRA at retirement, expect a more standardized paperwork process; revisit once the IRS finalizes the procedure."
+  },
+  {
+    "id": "glide-path-swr-research-2026-09",
+    "date": "2026-09-12",
+    "source": "Advanced Research: Bengen/Kitces-Pfau/Bernstein/ERN synthesis",
+    "url": "",
+    "rating": "🟡",
+    "summary": "Bond tent glide path recommended: begin de-risking at 54–55, trough ~60/40 stocks/bonds at retirement (60), drift back to 70–80% equity by mid-70s. Target 4% withdrawal rate for planning, not 4.7%. Build bond sleeve inside 401(k). Revisit at 54–55, 58, 60 based on CAPE.",
+    "suggestedAction": "none"
   }
 ]
