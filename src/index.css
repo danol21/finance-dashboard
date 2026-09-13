@@ -734,20 +734,9 @@ textarea {
   color: var(--gold);
 }
 
-.finding-actions {
-  display: flex;
-  gap: 0.6rem;
-  margin-top: 0.4rem;
-  flex-wrap: wrap;
-}
-
-.btn-icon-text {
-  background: transparent;
-  border-color: var(--border-subtle);
-  color: var(--text-secondary);
-}
-
-.btn-icon-text:hover {
-  border-color: var(--text-secondary);
-  color: var(--text-primary);
+.finding-logged-note {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
 }
