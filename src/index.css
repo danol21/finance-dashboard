@@ -406,6 +406,29 @@ textarea {
   font-size: 0.78rem;
 }
 
+.health-suggestion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--gold-soft);
+  border: 1px solid var(--gold-dim, var(--gold));
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+}
+
+.health-suggestion strong {
+  color: var(--gold);
+}
+
+.btn-suggestion-apply {
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
 .health-note {
   background: transparent;
   border: 1px solid var(--border-subtle);

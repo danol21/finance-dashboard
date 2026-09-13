@@ -136,7 +136,7 @@ export default function App() {
           accounts={data.accounts}
           onChange={updateContributionLimits}
         />
-        <HealthPanel health={data.health} onChange={updateHealth} />
+        <HealthPanel health={data.health} onChange={updateHealth} triggers={data.triggers} />
         <QuarterlyChecklist checklist={data.checklist} onChange={updateChecklist} />
         <TriggerLog triggers={data.triggers} onChange={updateTriggers} />
       </main>
