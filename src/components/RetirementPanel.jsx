@@ -81,15 +81,15 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
     <section className="panel">
       <h2
         className="panel-title"
-        title="Projects your balance forward to retirement using your current accounts, contributions, and an assumed rate of return."
+        title="Adds up everything you're saving today, then estimates what it could grow into by the time you retire — a best guess, not a promise."
       >
-        Retirement Projection
+        Retirement Savings Forecast
       </h2>
 
       <div className="retire-grid">
         <div className="field">
-          <label htmlFor="target-age" title="The age you're aiming to stop working. Drives how many years of growth the projection below assumes.">
-            Target retirement age <span className="field-value">{settings.targetAge}</span>
+          <label htmlFor="target-age" title="The age you're hoping to stop working. Everything below is built around this age.">
+            Age you want to retire <span className="field-value">{settings.targetAge}</span>
           </label>
           <input
             id="target-age"
@@ -99,13 +99,13 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
             step={1}
             value={settings.targetAge}
             onChange={set("targetAge")}
-            title="Drag to change your target retirement age (55–65)."
+            title="Drag to change the age you're aiming to retire by (55–65)."
           />
         </div>
 
         <div className="field">
-          <label htmlFor="self-age" title="Your age today — used to work out how many years are left until your target retirement age.">
-            Your current age
+          <label htmlFor="self-age" title="How old you are right now. Used to work out how many years you have left to save.">
+            Your age today
           </label>
           <input
             id="self-age"
@@ -119,8 +119,8 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
         </div>
 
         <div className="field">
-          <label htmlFor="spouse-offset" title="For reference only — doesn't affect the projection, just shown as a convenience.">
-            Spouse's age offset (years younger)
+          <label htmlFor="spouse-offset" title="Just for reference — this doesn't change any of the numbers below, it's shown as a convenience.">
+            How many years younger your spouse is
           </label>
           <input
             id="spouse-offset"
@@ -137,8 +137,11 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
         </div>
 
         <div className="field">
-          <label htmlFor="real-return" title="Your assumed annual investment growth rate AFTER inflation. A higher number makes the projection more optimistic — this is a guess, not a guarantee.">
-            Assumed real return (%)
+          <label
+            htmlFor="real-return"
+            title="A guess at how fast your investments will grow each year, on average, after subtracting inflation. Nobody knows the real number in advance — 5-7% is a commonly used starting guess for a stock-heavy portfolio. A higher number makes the forecast look better, but it's still just a guess."
+          >
+            Expected yearly growth, after inflation (%)
           </label>
           <input
             id="real-return"
@@ -146,13 +149,16 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
             step="0.1"
             value={settings.realReturn}
             onChange={set("realReturn")}
-            title="Annual growth rate assumption, after inflation, used to project your balance forward."
+            title="Sometimes called 'real return' — your investments' growth rate per year, after inflation is subtracted out."
           />
         </div>
 
         <div className="field">
-          <label htmlFor="nest-egg" title="Type a specific dollar target here to override the 'derived' goal calculated from your spending and withdrawal rate below. Leave blank to just use the derived goal.">
-            Nest-egg goal (optional, manual)
+          <label
+            htmlFor="nest-egg"
+            title="If you already have a specific dollar amount in mind as your target, type it here — it will be used instead of the calculated goal below. Leave blank to let the calculator work it out from your spending, further down."
+          >
+            Your own savings target (optional)
           </label>
           <input
             id="nest-egg"
@@ -161,13 +167,16 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
             placeholder="e.g. 2000000"
             value={settings.nestEggGoal}
             onChange={set("nestEggGoal")}
-            title="A specific savings target, if you have one in mind, instead of letting it be calculated from spending ÷ withdrawal rate."
+            title="A specific dollar amount, if you have one in mind, instead of letting it be calculated from your spending below."
           />
         </div>
 
         <div className="field">
-          <label htmlFor="withdrawal-rate" title="What % of your savings you plan to spend each year in retirement. Used with 'Annual retirement spending' below to work out how big a nest egg you'd need.">
-            Target withdrawal rate (%)
+          <label
+            htmlFor="withdrawal-rate"
+            title="Each year in retirement, this is roughly what % of your total savings you plan to take out and spend. It's used with your yearly spending below to work out how big your savings need to be."
+          >
+            % of savings you'll spend per year in retirement
           </label>
           <input
             id="withdrawal-rate"
@@ -175,17 +184,17 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
             step="0.1"
             value={settings.withdrawalRate}
             onChange={set("withdrawalRate")}
-            title="The % of your total savings you'd draw down each year once retired."
+            title="What % of your total savings you'd take out and spend each year once retired."
           />
           <span className="field-hint">
-            4% is a conservative planning anchor for a diversified, 35+ year horizon — not
-            necessarily the rate to withdraw at; can be revisited closer to retirement.
+            4% is a commonly used, cautious starting point meant to make savings last 35+ years —
+            not a rule, and something you can revisit as retirement gets closer.
           </span>
         </div>
 
         <div className="field">
-          <label htmlFor="annual-spending" title="How much you expect to spend per year once retired. Combined with the withdrawal rate above to calculate the 'derived nest-egg goal' shown below.">
-            Annual retirement spending (optional)
+          <label htmlFor="annual-spending" title="How much you expect to spend per year once retired. Combined with the % above to calculate the 'calculated savings target' shown below.">
+            How much you'll spend per year, retired (optional)
           </label>
           <input
             id="annual-spending"
@@ -201,9 +210,9 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
         <div className="field">
           <label
             htmlFor="other-income"
-            title="Guaranteed income you expect in retirement that doesn't come out of this portfolio — Social Security, a pension, rental income, etc. Reduces how much the derived nest-egg goal below needs to cover."
+            title="Money you'll get every year in retirement that ISN'T coming out of these accounts — Social Security, a pension, rental income, etc. This lowers how big your savings target needs to be, since it covers part of your spending on its own."
           >
-            Other retirement income/yr (optional)
+            Other income once retired, per year (optional)
           </label>
           <input
             id="other-income"
@@ -212,31 +221,31 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
             placeholder="e.g. 30000"
             value={settings.otherAnnualIncome}
             onChange={set("otherAnnualIncome")}
-            title="Expected annual Social Security, pension, or other guaranteed income once retired, in today's dollars — subtracted from annual spending before sizing the derived goal."
+            title="Expected yearly Social Security, pension, or other guaranteed income once retired, in today's dollars."
           />
         </div>
       </div>
 
       <div className="retire-results">
-        <div className="stat" title="How many years from now until your target retirement age.">
-          <span className="stat-label">Years to go</span>
+        <div className="stat" title="How many years from now until you reach the retirement age you set above.">
+          <span className="stat-label">Years until retirement</span>
           <span className="stat-value">{yearsToGo || "—"}</span>
         </div>
-        <div className="stat" title="What you have saved right now across all accounts, plus how much you're putting in per month today.">
-          <span className="stat-label">Current total (balance + monthly)</span>
+        <div className="stat" title="What you have saved right now across all accounts, plus how much you're putting in every month today.">
+          <span className="stat-label">What you have today</span>
           <span className="stat-value">{formatCurrency(totalBalance)}</span>
-          <span className="stat-sub">{formatCurrencyPrecise(totalMonthly)}/mo contributed</span>
+          <span className="stat-sub">{formatCurrencyPrecise(totalMonthly)}/mo going in</span>
         </div>
-        <div className="stat stat-primary" title="Your estimated balance at your target retirement age, if your current contributions and assumed growth rate continue unchanged.">
-          <span className="stat-label">Projected balance at retirement</span>
+        <div className="stat stat-primary" title="A rough estimate of your balance at retirement, if your current contributions and growth guess continue unchanged. This is a forecast, not a guarantee.">
+          <span className="stat-label">Estimated balance when you retire</span>
           <span className="stat-value stat-value-lg">{formatCurrency(projected)}</span>
         </div>
         {derivedGoal !== null && (
           <div
             className="stat"
-            title="The nest egg size that would let you cover your target annual spending, minus any Social Security/pension income, at your target withdrawal rate — without a manual override."
+            title="How big your savings would need to be to cover your yearly spending (minus any Social Security/pension) at the withdrawal % you set above."
           >
-            <span className="stat-label">Derived nest-egg goal (spending ÷ rate)</span>
+            <span className="stat-label">Your calculated savings target</span>
             <span className="stat-value">{formatCurrency(derivedGoal)}</span>
             <span className="stat-sub">
               {otherAnnualIncome > 0
@@ -248,10 +257,10 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
         {goalComparisonGap !== null && (
           <div
             className={`stat ${goalComparisonGap >= 0 ? "stat-positive" : "stat-negative"}`}
-            title="You've set both a manual nest-egg goal and spending/withdrawal-rate inputs — this shows how far apart the two goals are, since only one (the manual one) is actually used above."
+            title="You've entered both your own savings target and spending/withdrawal-% info — this shows how far apart the two are, since only your own target (not the calculated one) is actually used above."
           >
             <span className="stat-label">
-              Derived vs. manual goal — {goalComparisonGap >= 0 ? "derived is higher" : "derived is lower"}
+              Calculated vs. your target — {goalComparisonGap >= 0 ? "calculated is higher" : "calculated is lower"}
             </span>
             <span className="stat-value">{formatCurrency(Math.abs(goalComparisonGap))}</span>
           </div>
@@ -261,14 +270,14 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
             className={`stat ${goalGap >= 0 ? "stat-positive" : "stat-negative"}`}
             title={
               goalGap >= 0
-                ? "Your projected balance is ahead of your goal by this much."
-                : "Your projected balance falls short of your goal by this much — consider raising contributions, lowering the goal, or extending your target retirement age."
+                ? "Good news — at this pace, you're on track to have more than your target."
+                : "At this pace, you're on track to fall short of your target by this much. Ways to close the gap: put in more each month, push your retirement age back a bit, or lower your spending target."
             }
           >
-            <span className="stat-label">{goalGap >= 0 ? "Surplus vs. goal" : "Shortfall vs. goal"}</span>
+            <span className="stat-label">{goalGap >= 0 ? "You're ahead by" : "You're short by"}</span>
             <span className="stat-value">{formatCurrency(Math.abs(goalGap))}</span>
             <span className="stat-sub">
-              vs. {manualGoal !== null ? "manual" : "derived"} goal of {formatCurrency(effectiveGoal)}
+              vs. {manualGoal !== null ? "your" : "the calculated"} target of {formatCurrency(effectiveGoal)}
             </span>
           </div>
         )}
@@ -279,9 +288,10 @@ export default function RetirementPanel({ settings, onChange, accounts }) {
       )}
 
       <p className="field-hint growth-caveat">
-        This projection sums account balances at face value — it doesn't distinguish pre-tax
-        (Traditional 401(k)/IRA), Roth, and taxable brokerage dollars, which aren't worth the same
-        per dollar spent in retirement. Treat the number as directional, not a spendable total.
+        Good to know: this simply adds up every account's balance, but not every dollar here is
+        equal. Some of this (like a traditional 401(k)) will be taxed when you eventually withdraw
+        it; some (like a Roth IRA) won't. So the real, spendable amount is a bit less than the
+        number shown — treat this chart as showing the general trend, not an exact figure.
       </p>
     </section>
   );

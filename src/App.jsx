@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import NextStepsPanel from "./components/NextStepsPanel";
 import RetirementPanel from "./components/RetirementPanel";
 import AccountsTable from "./components/AccountsTable";
 import HealthPanel from "./components/HealthPanel";
@@ -152,7 +153,7 @@ export default function App() {
           reminders: parsed.reminders ?? data.reminders,
         });
       } catch (err) {
-        alert("Could not parse that file as JSON.");
+        alert("That doesn't look like a backup file this dashboard made — nothing was changed.");
         console.error(err);
       }
     };
@@ -165,24 +166,24 @@ export default function App() {
       <header className="app-header">
         <div>
           <h1 className="app-title">The Ledger</h1>
-          <p className="app-subtitle">Retirement &amp; account tracker</p>
+          <p className="app-subtitle">Your retirement &amp; account tracker</p>
         </div>
         <div className="header-actions">
           <button
             className="btn btn-ghost"
             onClick={exportJson}
             type="button"
-            title="Download everything on this dashboard (accounts, settings, reminders, trigger log) as a JSON file — a backup you can re-import later or on another device."
+            title="Saves a backup file of everything on this dashboard — accounts, settings, reminders, and your history log — to your computer. Keep it somewhere safe; you can load it back in later or on another device."
           >
-            Export JSON
+            Save a backup
           </button>
           <button
             className="btn btn-ghost"
             onClick={() => fileInputRef.current?.click()}
             type="button"
-            title="Load a previously exported JSON backup, replacing what's currently on this dashboard."
+            title="Load a backup file you saved earlier, replacing everything currently on this dashboard with what's in that file."
           >
-            Import JSON
+            Load a backup
           </button>
           <input
             ref={fileInputRef}
@@ -195,6 +196,12 @@ export default function App() {
       </header>
 
       <main className="app-main">
+        <NextStepsPanel
+          reminders={data.reminders}
+          triggers={data.triggers}
+          contributionSuggestion={contributionSuggestion}
+          health={data.health}
+        />
         <RemindersPanel reminders={data.reminders} onChange={updateReminders} />
         <FindingsSync
           reviewedFindingIds={data.reviewedFindingIds}
@@ -244,7 +251,10 @@ export default function App() {
       </main>
 
       <footer className="app-footer">
-        <p>Data is saved locally in this browser (localStorage). Export a JSON backup periodically.</p>
+        <p>
+          Everything you type here is saved only in this browser, on this device — it isn't backed
+          up anywhere else automatically. Click "Save a backup" above every so often, just in case.
+        </p>
       </footer>
     </div>
   );

@@ -62,7 +62,7 @@ export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAdd
         onClick={runFetch}
         disabled={checking}
         type="button"
-        title="Manually re-check for new findings from the monthly/weekly automated scans, instead of waiting for the next scheduled run."
+        title="Manually check right now for anything new from your automatic monthly/weekly scans, instead of waiting for the next scheduled check."
       >
         {checking ? "Checking…" : "Check for updates"}
       </button>
@@ -72,10 +72,10 @@ export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAdd
           className="sync-banner"
           onClick={() => setExpanded((e) => !e)}
           type="button"
-          title="These were added automatically to the Trigger Log below — click to see what they are."
+          title="These were added automatically to the list below — click to see what they are."
         >
-          {justLogged.length} new finding{justLogged.length === 1 ? "" : "s"} auto-added to your
-          trigger log — {expanded ? "hide" : "view them"}
+          {justLogged.length} new item{justLogged.length === 1 ? "" : "s"} added to your Things to
+          Act On or Watch list — {expanded ? "hide" : "view them"}
         </button>
       )}
 
@@ -103,7 +103,8 @@ export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAdd
                 </a>
               )}
               <p className="finding-logged-note">
-                Added to the trigger log below. Edit or delete it there if it doesn't apply.
+                Added to the Things to Act On or Watch list below. Edit or delete it there if it
+                doesn't apply to you.
               </p>
             </div>
           ))}

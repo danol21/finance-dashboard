@@ -1,16 +1,27 @@
 const STATUSES = [
   { value: "ok", label: "On track" },
-  { value: "watch", label: "Watch" },
-  { value: "flagged", label: "Flagged" },
+  { value: "watch", label: "Keep an eye on it" },
+  { value: "flagged", label: "Needs attention" },
 ];
 
+// These four strings are the actual storage keys for saved health/checklist
+// data (see seedData.js) — changing them would silently disconnect existing
+// saved statuses/notes from the categories shown here. Only the *display*
+// text (CATEGORY_DISPLAY) is meant to be reworded.
 const CATEGORIES = ["Fee drag", "Allocation drift", "Tax efficiency", "Contribution room"];
 
+const CATEGORY_DISPLAY = {
+  "Fee drag": "Fees",
+  "Allocation drift": "Investment Mix",
+  "Tax efficiency": "Right Account for the Job",
+  "Contribution room": "Contribution Pace",
+};
+
 const CATEGORY_HINTS = {
-  "Fee drag": "How much fund/account fees are costing you overall.",
-  "Allocation drift": "Whether your actual mix of investments has wandered from your target — includes idle cash and performance lag.",
-  "Tax efficiency": "Whether money is sitting in the wrong type of account for its tax treatment (e.g. things that generate income sitting in a taxable account).",
-  "Contribution room": "Whether you're pacing to use (but not exceed) this year's contribution limits.",
+  "Fee drag": "How much you're paying in fund and account fees overall — lower is better.",
+  "Allocation drift": "Whether your investments have wandered from your plan — includes cash sitting uninvested and returns lagging behind.",
+  "Tax efficiency": "Whether money is sitting in the wrong kind of account for tax purposes (e.g. an investment that generates a lot of taxable income sitting in a regular brokerage account instead of a retirement account).",
+  "Contribution room": "Whether you're on pace to put in a healthy amount this year, without going over the IRS limit.",
 };
 
 // Which Trigger Log categories feed a suggested status for each health card.
@@ -65,9 +76,9 @@ export default function HealthPanel({ health, onChange, triggers = [], contribut
     <section className="panel">
       <h2
         className="panel-title"
-        title="A quarterly-review snapshot of four things worth checking on your portfolio. Each card's status can be set by hand or accepted from an automatic suggestion below it."
+        title="Four things worth checking on regularly. Each card's status is your own call — On Track, Watch, or Flagged — and you can accept a suggested status if one shows up below it."
       >
-        Structural Health
+        Four Things Worth Checking On
       </h2>
       <div className="health-grid">
         {CATEGORIES.map((category) => {
@@ -82,7 +93,7 @@ export default function HealthPanel({ health, onChange, triggers = [], contribut
             <div key={category} className={`health-card health-${entry.status}`}>
               <div className="health-card-header">
                 <span className="health-card-title" title={CATEGORY_HINTS[category]}>
-                  {category}
+                  {CATEGORY_DISPLAY[category] ?? category}
                 </span>
                 <select
                   className="status-select"
