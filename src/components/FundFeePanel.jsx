@@ -44,7 +44,12 @@ export default function FundFeePanel({ accounts, snapshotHoldings = [], settings
 
   return (
     <section className="panel">
-      <h2 className="panel-title">Fund &amp; Fee Review</h2>
+      <h2
+        className="panel-title"
+        title="Looks at fees on funds we can identify by ticker, and flags cheaper same-category alternatives where one exists."
+      >
+        Fund &amp; Fee Review
+      </h2>
       <p className="fund-caption">
         Tag each account's fund with its ticker in the Accounts table (e.g. FZROX, FTIHX) to see
         its expense-ratio drag and whether a cheaper same-category equivalent exists. Expense
@@ -57,15 +62,15 @@ export default function FundFeePanel({ accounts, snapshotHoldings = [], settings
       ) : (
         <>
           <div className="retire-results">
-            <div className="stat">
+            <div className="stat" title="The total balance across only the holdings we recognize by ticker — untagged or unrecognized holdings aren't included, so this can be less than your full portfolio.">
               <span className="stat-label">Tagged balance</span>
               <span className="stat-value">{formatCurrency(totalTaggedBalance)}</span>
             </div>
-            <div className="stat">
+            <div className="stat" title="The average fee rate across all recognized holdings, weighted by balance — lower is better. Index funds like FZROX/FTIHX typically run near 0%.">
               <span className="stat-label">Blended expense ratio</span>
               <span className="stat-value">{blendedER.toFixed(3)}%</span>
             </div>
-            <div className="stat stat-primary">
+            <div className="stat stat-primary" title="Roughly how much you're paying per year in fund fees across the recognized holdings below, based on their expense ratios and current balances.">
               <span className="stat-label">Est. annual fee cost</span>
               <span className="stat-value stat-value-lg">{formatCurrencyPrecise(totalAnnualFee)}</span>
             </div>
@@ -73,7 +78,7 @@ export default function FundFeePanel({ accounts, snapshotHoldings = [], settings
 
           <div className="fund-holdings">
             {rows.map((r) => (
-              <div key={r.row.id} className="fund-row">
+              <div key={r.row.id} className="fund-row" title={`${r.fund.name} in ${r.row.label} — ${r.fund.expenseRatio.toFixed(3)}% expense ratio costs about ${formatCurrencyPrecise(annualFeeCost(r.row.balance, r.fund.expenseRatio))}/yr on this balance.`}>
                 <span className="fund-ticker">{r.fund.ticker}</span>
                 <span className="fund-name">{r.fund.name}</span>
                 <span className="fund-account">{r.row.label}</span>

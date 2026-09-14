@@ -54,55 +54,75 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
 
   return (
     <section className="panel">
-      <h2 className="panel-title">Glide Path (Bond Tent)</h2>
+      <h2
+        className="panel-title"
+        title="A plan for how much of your portfolio stays in stocks vs. bonds/cash as you get closer to and then live through retirement — riskier while young, more protected right around retirement, then gradually riskier again since retirement can last decades."
+      >
+        Glide Path (Bond Tent)
+      </h2>
 
       <div className="retire-grid glide-grid">
         <div className="field">
-          <label htmlFor="gp-start">De-risk start age</label>
+          <label htmlFor="gp-start" title="The age at which you start shifting money from stocks into bonds/cash, ahead of retirement.">
+            De-risk start age
+          </label>
           <input
             id="gp-start"
             type="number"
             value={glidePath.deRiskStartAge}
             onChange={set("deRiskStartAge")}
+            title="Age to start gradually reducing stock exposure."
           />
         </div>
         <div className="field">
-          <label htmlFor="gp-pre">Pre-de-risk equity (%)</label>
+          <label htmlFor="gp-pre" title="Your stock allocation before de-risking begins — typically high, since retirement is still far off.">
+            Pre-de-risk equity (%)
+          </label>
           <input
             id="gp-pre"
             type="number"
             step="1"
             value={glidePath.preEquity}
             onChange={set("preEquity")}
+            title="% of your portfolio in stocks before de-risking starts."
           />
         </div>
         <div className="field">
-          <label htmlFor="gp-trough">Trough equity at retirement (%)</label>
+          <label htmlFor="gp-trough" title="Your lowest planned stock allocation, reached right at retirement — the most protected point, since a market drop right before you start withdrawing does the most damage.">
+            Trough equity at retirement (%)
+          </label>
           <input
             id="gp-trough"
             type="number"
             step="1"
             value={glidePath.troughEquity}
             onChange={set("troughEquity")}
+            title="% of your portfolio in stocks at the moment you retire — your most conservative point."
           />
         </div>
         <div className="field">
-          <label htmlFor="gp-end-age">Drift-back complete by age</label>
+          <label htmlFor="gp-end-age" title="The age by which you finish gradually increasing stocks again after retirement, since a multi-decade retirement still needs growth.">
+            Drift-back complete by age
+          </label>
           <input
             id="gp-end-age"
             type="number"
             value={glidePath.driftEndAge}
             onChange={set("driftEndAge")}
+            title="Age by which your stock allocation finishes rising back up after retirement."
           />
         </div>
         <div className="field">
-          <label htmlFor="gp-post">Target equity by then (%)</label>
+          <label htmlFor="gp-post" title="Your stock allocation once drift-back is complete — usually higher than the retirement trough, to keep growing through a long retirement.">
+            Target equity by then (%)
+          </label>
           <input
             id="gp-post"
             type="number"
             step="1"
             value={glidePath.postEquity}
             onChange={set("postEquity")}
+            title="% of your portfolio in stocks once drift-back is complete."
           />
         </div>
       </div>

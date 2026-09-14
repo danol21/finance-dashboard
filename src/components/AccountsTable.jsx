@@ -1,5 +1,6 @@
 import { num, effectiveMonthly, formatCurrency, formatCurrencyPrecise, isElectiveDeferralType } from "../lib/finance";
 import { makeId } from "../lib/storage";
+import { isDuplicateOfSynced } from "../lib/liveSnapshot";
 
 const ACCOUNT_TYPES = [
   "Brokerage",
@@ -14,7 +15,14 @@ const ACCOUNT_TYPES = [
 ];
 
 export default function AccountsTable({ accounts, onChange, syncedAccounts = [], onUpdateSyncedContribution }) {
-  const allRows = [...accounts, ...syncedAccounts];
+  // A manual account whose name matches a synced one is hidden here (and left
+  // out of the totals below) so it never doubles up with its synced version —
+  // it's NOT removed from storage, so unhiding it is as simple as renaming it
+  // to stop matching. Edits (updateRow/removeRow/addRow) still operate on the
+  // full `accounts` list, never this filtered view, so a hidden duplicate is
+  // never accidentally dropped by an unrelated edit.
+  const visibleManualAccounts = accounts.filter((a) => !isDuplicateOfSynced(a, syncedAccounts));
+  const allRows = [...visibleManualAccounts, ...syncedAccounts];
   const totalBalance = allRows.reduce((sum, a) => sum + num(a.balance), 0);
   const totalMonthly = allRows.reduce((sum, a) => sum + effectiveMonthly(a), 0);
 
@@ -85,7 +93,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
             </tr>
           </thead>
           <tbody>
-            {accounts.map((a) => (
+            {visibleManualAccounts.map((a) => (
               <tr key={a.id}>
                 <td>
                   <input
@@ -110,6 +118,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                     className="cell-input"
                     value={a.type}
                     onChange={(e) => updateRow(a.id, "type", e.target.value)}
+                    title="Tax treatment of this account — controls which limit/panel it counts toward."
                   >
                     {ACCOUNT_TYPES.map((t) => (
                       <option key={t} value={t}>
@@ -134,6 +143,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                     value={a.balance}
                     onChange={(e) => updateRow(a.id, "balance", e.target.value)}
                     placeholder="0.00"
+                    title="Current balance — update by hand for accounts not synced via Truthifi."
                   />
                 </td>
                 <td className="col-num">
@@ -169,6 +179,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                       value={a.monthly}
                       onChange={(e) => updateRow(a.id, "monthly", e.target.value)}
                       placeholder="0.00"
+                      title="Total monthly amount going into this account, used in the Retirement Projection."
                     />
                   )}
                 </td>
@@ -242,7 +253,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                           value={a.employeeMonthly ?? ""}
                           onChange={(e) => onUpdateSyncedContribution(a.accountId, "employeeMonthly", e.target.value)}
                           placeholder="0.00"
-                          title="Employee contribution (pre-tax + Roth)"
+                          title="Your own contribution (pre-tax + Roth combined), estimated monthly from past transactions. If you've changed your contribution % recently in ADP/Voya, this may still show the OLD amount until enough new paychecks build up a new pattern — overwrite it here to keep this accurate now."
                         />
                       </div>
                       <div className="split-monthly-row">
@@ -253,7 +264,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                           value={a.employerMonthly ?? ""}
                           onChange={(e) => onUpdateSyncedContribution(a.accountId, "employerMonthly", e.target.value)}
                           placeholder="0.00"
-                          title="Employer match / Safe Harbor"
+                          title="Employer match / Safe Harbor, estimated monthly from past transactions. This moves with your own contribution % (it's a dollar-for-dollar match up to the cap) — if you reduce your %, this drops too, so update it here if it looks stale."
                         />
                       </div>
                     </div>
@@ -276,11 +287,19 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
           </tbody>
           <tfoot>
             <tr>
-              <td colSpan={4} className="totals-label">
+              <td
+                colSpan={4}
+                className="totals-label"
+                title="Sum of every account below — manual accounts hidden as duplicates of a synced account are excluded, so this won't double-count."
+              >
                 Totals
               </td>
-              <td className="col-num totals-value">{formatCurrency(totalBalance)}</td>
-              <td className="col-num totals-value">{formatCurrencyPrecise(totalMonthly)}</td>
+              <td className="col-num totals-value" title="Sum of all account balances.">
+                {formatCurrency(totalBalance)}
+              </td>
+              <td className="col-num totals-value" title="Sum of all monthly contributions (employee + employer where applicable).">
+                {formatCurrencyPrecise(totalMonthly)}
+              </td>
               <td colSpan={2}></td>
             </tr>
           </tfoot>

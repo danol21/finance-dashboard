@@ -6,6 +6,13 @@ const STATUSES = [
 
 const CATEGORIES = ["Fee drag", "Allocation drift", "Tax efficiency", "Contribution room"];
 
+const CATEGORY_HINTS = {
+  "Fee drag": "How much fund/account fees are costing you overall.",
+  "Allocation drift": "Whether your actual mix of investments has wandered from your target — includes idle cash and performance lag.",
+  "Tax efficiency": "Whether money is sitting in the wrong type of account for its tax treatment (e.g. things that generate income sitting in a taxable account).",
+  "Contribution room": "Whether you're pacing to use (but not exceed) this year's contribution limits.",
+};
+
 // Which Trigger Log categories feed a suggested status for each health card.
 // Cash management and Performance findings don't have a dedicated health
 // card, so they fold into Allocation drift — both are ultimately about how
@@ -17,21 +24,36 @@ const TRIGGER_CATEGORIES_FOR_HEALTH = {
   "Contribution room": ["Contribution change"],
 };
 
+const STATUS_RANK = { flagged: 2, watch: 1 };
+
 const statusLabel = (value) => STATUSES.find((s) => s.value === value)?.label ?? value;
 
-function suggestStatus(category, triggers) {
+// `directSuggestion` is Contribution Limits' own red/yellow pacing status
+// (see lib/contributionLimits.js) — it's folded in here so "Contribution
+// room" can't silently show On track while the Contribution Limits panel
+// above is showing a red "projected to exceed limit" warning. Previously
+// this card only lit up if someone had separately logged a matching Trigger
+// Log entry by hand, which meant a real over-the-limit warning could sit
+// unflagged here until someone noticed and logged it themselves.
+function suggestStatus(category, triggers, directSuggestion) {
   const relevantCategories = TRIGGER_CATEGORIES_FOR_HEALTH[category] ?? [];
   const relevant = triggers.filter((t) => !t.resolved && relevantCategories.includes(t.category));
+  const candidates = [];
   if (relevant.some((t) => t.rating === "act")) {
-    return { status: "flagged", count: relevant.length };
+    candidates.push({ status: "flagged", reason: `${relevant.length} unresolved finding${relevant.length === 1 ? "" : "s"}` });
+  } else if (relevant.some((t) => t.rating === "watch")) {
+    candidates.push({ status: "watch", reason: `${relevant.length} unresolved finding${relevant.length === 1 ? "" : "s"}` });
   }
-  if (relevant.some((t) => t.rating === "watch")) {
-    return { status: "watch", count: relevant.length };
+  if (category === "Contribution room" && directSuggestion) {
+    candidates.push(directSuggestion);
   }
-  return null;
+  return candidates.reduce(
+    (best, c) => (!best || STATUS_RANK[c.status] > STATUS_RANK[best.status] ? c : best),
+    null
+  );
 }
 
-export default function HealthPanel({ health, onChange, triggers = [] }) {
+export default function HealthPanel({ health, onChange, triggers = [], contributionSuggestion = null }) {
   const updateCategory = (category, field, value) => {
     onChange({
       ...health,
@@ -41,20 +63,32 @@ export default function HealthPanel({ health, onChange, triggers = [] }) {
 
   return (
     <section className="panel">
-      <h2 className="panel-title">Structural Health</h2>
+      <h2
+        className="panel-title"
+        title="A quarterly-review snapshot of four things worth checking on your portfolio. Each card's status can be set by hand or accepted from an automatic suggestion below it."
+      >
+        Structural Health
+      </h2>
       <div className="health-grid">
         {CATEGORIES.map((category) => {
           const entry = health[category] ?? { status: "ok", note: "", updated: "" };
-          const suggestion = suggestStatus(category, triggers);
+          const suggestion = suggestStatus(
+            category,
+            triggers,
+            category === "Contribution room" ? contributionSuggestion : null
+          );
           const suggestionDiffers = suggestion && suggestion.status !== entry.status;
           return (
             <div key={category} className={`health-card health-${entry.status}`}>
               <div className="health-card-header">
-                <span className="health-card-title">{category}</span>
+                <span className="health-card-title" title={CATEGORY_HINTS[category]}>
+                  {category}
+                </span>
                 <select
                   className="status-select"
                   value={entry.status}
                   onChange={(e) => updateCategory(category, "status", e.target.value)}
+                  title="Your own call on this — On track, Watch, or Flagged. Set automatically to match a suggestion below only if you click Apply."
                 >
                   {STATUSES.map((s) => (
                     <option key={s.value} value={s.value}>
@@ -64,15 +98,18 @@ export default function HealthPanel({ health, onChange, triggers = [] }) {
                 </select>
               </div>
               {suggestionDiffers && (
-                <div className="health-suggestion">
+                <div
+                  className="health-suggestion"
+                  title="Based on unresolved items in the Trigger Log and/or your Contribution Limits pacing — doesn't change anything until you click Apply."
+                >
                   <span>
-                    Suggested: <strong>{statusLabel(suggestion.status)}</strong> ({suggestion.count}{" "}
-                    unresolved finding{suggestion.count === 1 ? "" : "s"})
+                    Suggested: <strong>{statusLabel(suggestion.status)}</strong> ({suggestion.reason})
                   </span>
                   <button
                     className="btn btn-ghost btn-suggestion-apply"
                     type="button"
                     onClick={() => updateCategory(category, "status", suggestion.status)}
+                    title="Set this card's status to match the suggestion."
                   >
                     Apply
                   </button>
@@ -84,6 +121,7 @@ export default function HealthPanel({ health, onChange, triggers = [] }) {
                 onChange={(e) => updateCategory(category, "note", e.target.value)}
                 placeholder="Notes..."
                 rows={3}
+                title={entry.note || "Your own notes on why this is at its current status."}
               />
             </div>
           );

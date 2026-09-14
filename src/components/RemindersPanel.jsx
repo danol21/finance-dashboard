@@ -67,10 +67,15 @@ export default function RemindersPanel({ reminders, onChange }) {
                 <span className="reminder-title">{r.title}</span>
                 {r.note && <span className="reminder-note">{r.note}</span>}
               </div>
-              <span className="reminder-due">
+              <span className="reminder-due" title="Due date, and how many days away that is.">
                 {r.dueDate} · {dayLabel}
               </span>
-              <button className="btn btn-ghost reminder-done-btn" onClick={() => complete(r.id)} type="button">
+              <button
+                className="btn btn-ghost reminder-done-btn"
+                onClick={() => complete(r.id)}
+                type="button"
+                title="Mark as done. It won't reappear — there's no delete, so completing is how you clear a reminder."
+              >
                 Done
               </button>
             </div>

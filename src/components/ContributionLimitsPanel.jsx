@@ -1,40 +1,5 @@
 import { num, effectiveMonthly, formatCurrency } from "../lib/finance";
-
-const LIMIT_CATEGORIES = [
-  {
-    key: "limit401k",
-    label: "401(k) elective deferral",
-    matchTypes: ["401(k)", "403(b)"],
-    employeeOnly: true,
-    secondary: {
-      key: "limit415c",
-      label: "415(c) combined (employee + employer)",
-    },
-  },
-  {
-    key: "limitIRA",
-    label: "IRA (Traditional + Roth combined)",
-    matchTypes: ["Traditional IRA", "Roth IRA"],
-  },
-  {
-    key: "limitHSA",
-    label: "Family HSA",
-    matchTypes: ["HSA"],
-  },
-];
-
-const SHORTFALL_THRESHOLD = 0.85;
-
-function statusFor(annualPace, limit, monthsRemaining) {
-  if (limit <= 0) return { key: "none", emoji: "🟢", label: "No limit set" };
-  if (annualPace > limit) {
-    return { key: "act", emoji: "🔴", label: "Projected to exceed limit" };
-  }
-  if (monthsRemaining > 0 && annualPace < limit * SHORTFALL_THRESHOLD) {
-    return { key: "watch", emoji: "🟡", label: "On pace to fall meaningfully short" };
-  }
-  return { key: "none", emoji: "🟢", label: "On track" };
-}
+import { LIMIT_CATEGORIES, statusFor } from "../lib/contributionLimits";
 
 // Employee-only monthly figure: for 401(k)/403(b) accounts the elective-deferral
 // limit applies to the employee's own pre-tax + Roth money, not employer
@@ -53,7 +18,12 @@ export default function ContributionLimitsPanel({ limits, accounts, onChange }) 
 
   return (
     <section className="panel">
-      <h2 className="panel-title">Contribution Limits</h2>
+      <h2
+        className="panel-title"
+        title="Tracks how close you're pacing to each year's IRS contribution cap, based on your current monthly contributions annualized."
+      >
+        Contribution Limits
+      </h2>
       <div className="limits-grid">
         {LIMIT_CATEGORIES.map((cat) => {
           const matching = accounts.filter((a) => cat.matchTypes.includes(a.type));
@@ -80,14 +50,24 @@ export default function ContributionLimitsPanel({ limits, accounts, onChange }) 
             <div key={cat.key} className={`limit-card limit-${status.key}`}>
               <div className="limit-card-header">
                 <span className="limit-card-title">{cat.label}</span>
-                <span className={`rating-badge rating-${status.key}`} title={status.label}>
+                <span
+                  className={`rating-badge rating-${status.key}`}
+                  title={`${status.label} — based on your current monthly contribution rate kept up for the rest of the year.`}
+                >
                   <span className="rating-dot" />
                   {status.emoji}
                 </span>
               </div>
 
               <div className="field limit-field">
-                <label htmlFor={`limit-${cat.key}`}>
+                <label
+                  htmlFor={`limit-${cat.key}`}
+                  title={
+                    cat.employeeOnly
+                      ? "The IRS cap on your own contributions only — employer match doesn't count against this one."
+                      : "The IRS cap on total contributions to this account type for the year."
+                  }
+                >
                   {now.getFullYear()} limit ($){cat.employeeOnly ? " — employee only" : ""}
                 </label>
                 <input
@@ -97,11 +77,12 @@ export default function ContributionLimitsPanel({ limits, accounts, onChange }) 
                   value={limits[cat.key] ?? ""}
                   onChange={set(cat.key)}
                   placeholder="0"
+                  title="Edit if the IRS updates this year's limit, or it was entered wrong."
                 />
               </div>
 
               <div className="limit-summary">
-                <span>
+                <span title="Your current monthly contribution to this account type, multiplied by 12 — i.e. what you'd end the year at if nothing changes.">
                   Paced at <strong>{formatCurrency(annualPace)}</strong>
                   {limitValue > 0 ? ` (${pct.toFixed(0)}% of limit)` : ""}
                 </span>
@@ -111,7 +92,10 @@ export default function ContributionLimitsPanel({ limits, accounts, onChange }) 
               {secondary && (
                 <div className="limit-secondary">
                   <div className="field limit-field limit-field-secondary">
-                    <label htmlFor={`limit-${secondary.key}`}>
+                    <label
+                      htmlFor={`limit-${secondary.key}`}
+                      title="A separate, higher IRS cap that includes BOTH your contribution and your employer's match combined."
+                    >
                       {now.getFullYear()} {secondary.label} ($)
                     </label>
                     <input
@@ -121,9 +105,13 @@ export default function ContributionLimitsPanel({ limits, accounts, onChange }) 
                       value={limits[secondary.key] ?? ""}
                       onChange={set(secondary.key)}
                       placeholder="0"
+                      title="Edit if the IRS updates this year's limit, or it was entered wrong."
                     />
                   </div>
-                  <span className="limit-secondary-summary">
+                  <span
+                    className="limit-secondary-summary"
+                    title="Your contribution plus your employer's match, annualized — checked against the higher combined cap above, separately from the employee-only limit."
+                  >
                     Combined (employee + employer): <strong>{formatCurrency(secondaryAnnualPace)}</strong>
                     {secondaryLimit > 0 ? ` (${secondaryPct.toFixed(0)}% of ${formatCurrency(secondaryLimit)})` : ""}
                   </span>

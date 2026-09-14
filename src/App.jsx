@@ -13,6 +13,7 @@ import LiveSnapshotPanel from "./components/LiveSnapshotPanel";
 import { loadData, saveData } from "./lib/storage";
 import { seedData } from "./data/seedData";
 import { deriveSyncedAccounts, deriveSnapshotHoldingRows, mergeAccounts } from "./lib/liveSnapshot";
+import { worstContributionSuggestion } from "./lib/contributionLimits";
 
 export default function App() {
   const [data, setData] = useState(() => loadData());
@@ -75,6 +76,7 @@ export default function App() {
   const syncedAccounts = deriveSyncedAccounts(snapshot, data.syncedContributions);
   const effectiveAccounts = mergeAccounts(data.accounts, syncedAccounts);
   const snapshotHoldings = deriveSnapshotHoldingRows(snapshot);
+  const contributionSuggestion = worstContributionSuggestion(data.settings.contributionLimits, effectiveAccounts);
 
   const updateSyncedContribution = (accountId, field, value) =>
     setData((d) => ({
@@ -166,13 +168,19 @@ export default function App() {
           <p className="app-subtitle">Retirement &amp; account tracker</p>
         </div>
         <div className="header-actions">
-          <button className="btn btn-ghost" onClick={exportJson} type="button">
+          <button
+            className="btn btn-ghost"
+            onClick={exportJson}
+            type="button"
+            title="Download everything on this dashboard (accounts, settings, reminders, trigger log) as a JSON file — a backup you can re-import later or on another device."
+          >
             Export JSON
           </button>
           <button
             className="btn btn-ghost"
             onClick={() => fileInputRef.current?.click()}
             type="button"
+            title="Load a previously exported JSON backup, replacing what's currently on this dashboard."
           >
             Import JSON
           </button>
@@ -225,7 +233,12 @@ export default function App() {
           accounts={effectiveAccounts}
           onChange={updateContributionLimits}
         />
-        <HealthPanel health={data.health} onChange={updateHealth} triggers={data.triggers} />
+        <HealthPanel
+          health={data.health}
+          onChange={updateHealth}
+          triggers={data.triggers}
+          contributionSuggestion={contributionSuggestion}
+        />
         <QuarterlyChecklist checklist={data.checklist} onChange={updateChecklist} />
         <TriggerLog triggers={data.triggers} onChange={updateTriggers} />
       </main>

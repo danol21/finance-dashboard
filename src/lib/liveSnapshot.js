@@ -94,16 +94,23 @@ function normalizeAccountName(name) {
     .trim();
 }
 
-function namesMatch(manualName, syncedName) {
+// Exported so every place that displays or totals manual accounts alongside
+// synced ones (the Accounts table's own rendering, its own totals row, and
+// this file's mergeAccounts) uses the exact same rule — otherwise a manual
+// account can silently double-count in one place while correctly hidden in
+// another, which is what happened when only mergeAccounts used this check.
+export function namesMatch(manualName, syncedName) {
   const a = normalizeAccountName(manualName);
   const b = normalizeAccountName(syncedName);
   if (!a || !b) return false;
   return a === b || a.includes(b) || b.includes(a);
 }
 
+export function isDuplicateOfSynced(manualAccount, syncedAccounts) {
+  return syncedAccounts.some((s) => namesMatch(manualAccount.name, s.name));
+}
+
 export function mergeAccounts(manualAccounts, syncedAccounts) {
-  const manualKept = manualAccounts.filter(
-    (a) => !syncedAccounts.some((s) => namesMatch(a.name, s.name))
-  );
+  const manualKept = manualAccounts.filter((a) => !isDuplicateOfSynced(a, syncedAccounts));
   return [...manualKept, ...syncedAccounts];
 }

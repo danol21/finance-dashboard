@@ -62,12 +62,18 @@ export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAdd
         onClick={runFetch}
         disabled={checking}
         type="button"
+        title="Manually re-check for new findings from the monthly/weekly automated scans, instead of waiting for the next scheduled run."
       >
         {checking ? "Checking…" : "Check for updates"}
       </button>
 
       {justLogged.length > 0 && (
-        <button className="sync-banner" onClick={() => setExpanded((e) => !e)} type="button">
+        <button
+          className="sync-banner"
+          onClick={() => setExpanded((e) => !e)}
+          type="button"
+          title="These were added automatically to the Trigger Log below — click to see what they are."
+        >
           {justLogged.length} new finding{justLogged.length === 1 ? "" : "s"} auto-added to your
           trigger log — {expanded ? "hide" : "view them"}
         </button>

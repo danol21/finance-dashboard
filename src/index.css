@@ -532,7 +532,12 @@ textarea {
   font-style: italic;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 960px) {
+  /* Below ~960px, the fixed-width date/category/rating columns leave almost
+     nothing for the note column (it can shrink to a sliver, showing only its
+     first character) since explicit px columns never yield space to a 1fr
+     neighbor. Stacking avoids that squeeze entirely rather than trying to
+     rebalance fixed widths that would just break again at some other size. */
   .trigger-row {
     grid-template-columns: 1fr;
   }

@@ -56,8 +56,10 @@ export default function TriggerLog({ triggers, onChange }) {
   return (
     <section className="panel">
       <div className="panel-header-row">
-        <h2 className="panel-title">Trigger Log</h2>
-        <button className="btn btn-ghost" onClick={addEntry} type="button">
+        <h2 className="panel-title" title="A running history of things worth acting on or keeping an eye on — some added automatically by the monthly scan, some added by hand.">
+          Trigger Log
+        </h2>
+        <button className="btn btn-ghost" onClick={addEntry} type="button" title="Log a new finding by hand.">
           + Add entry
         </button>
       </div>
@@ -68,7 +70,7 @@ export default function TriggerLog({ triggers, onChange }) {
           const rating = ratingByValue[t.rating ?? "watch"] ?? ratingByValue.watch;
           return (
             <div key={t.id} className={`trigger-row ${t.resolved ? "trigger-resolved" : ""}`}>
-              <span className={`rating-badge ${rating.className}`} title={rating.label}>
+              <span className={`rating-badge ${rating.className}`} title={`Priority: ${rating.label}`}>
                 <span className="rating-dot" />
                 {rating.emoji}
               </span>
@@ -77,11 +79,13 @@ export default function TriggerLog({ triggers, onChange }) {
                 className="cell-input trigger-date"
                 value={t.date}
                 onChange={(e) => updateEntry(t.id, "date", e.target.value)}
+                title="When this was found or logged."
               />
               <select
                 className="cell-input trigger-category"
                 value={t.category}
                 onChange={(e) => updateEntry(t.id, "category", e.target.value)}
+                title="What kind of issue this is — used to group related findings and feed the Structural Health suggestions above."
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -93,6 +97,7 @@ export default function TriggerLog({ triggers, onChange }) {
                 className="cell-input trigger-rating"
                 value={t.rating ?? "watch"}
                 onChange={(e) => updateEntry(t.id, "rating", e.target.value)}
+                title="How urgent this is: Act now needs action soon, Log & monitor just needs watching, No action means it was checked and is fine."
               >
                 {RATINGS.map((r) => (
                   <option key={r.value} value={r.value}>
@@ -106,8 +111,9 @@ export default function TriggerLog({ triggers, onChange }) {
                 onChange={(e) => updateEntry(t.id, "note", e.target.value)}
                 placeholder="What triggered this, and what to do about it..."
                 rows={2}
+                title={t.note || "What triggered this finding and what to do about it."}
               />
-              <label className="trigger-resolved-toggle">
+              <label className="trigger-resolved-toggle" title="Check this off once you've dealt with it — it stays in the log but fades out and stops counting toward Structural Health suggestions.">
                 <input
                   type="checkbox"
                   checked={t.resolved}
