@@ -50,7 +50,7 @@ export async function fetchFindings() {
     if (!res.ok) return [];
     const json = await res.json();
     return Array.isArray(json) ? json : [];
-  } catch (err) {
+  } catch {
     return [];
   }
 }

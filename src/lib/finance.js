@@ -62,6 +62,44 @@ export function projectBalance({
 }
 
 /**
+ * Yearly projected-balance trajectory from `startAge` to `endAge`, using the
+ * same month-by-month simulation as `projectBalance` (so the elective-deferral
+ * cap resets each January here too). Powers the Retirement Projection growth
+ * chart — a single line, one point per age, rather than just the endpoint.
+ */
+export function projectBalanceSeries({
+  presentValue,
+  employeeMonthly,
+  employerMonthly,
+  otherMonthly,
+  annualRatePct,
+  startAge,
+  endAge,
+  electiveDeferralLimit,
+  startMonthOfYear = new Date().getMonth() + 1,
+}) {
+  if (!Number.isFinite(startAge) || !Number.isFinite(endAge) || endAge < startAge) return [];
+  const points = [];
+  for (let age = startAge; age <= endAge; age++) {
+    const months = Math.round((age - startAge) * 12);
+    points.push({
+      age,
+      balance: projectBalance({
+        presentValue,
+        employeeMonthly,
+        employerMonthly,
+        otherMonthly,
+        annualRatePct,
+        months,
+        electiveDeferralLimit,
+        startMonthOfYear,
+      }),
+    });
+  }
+  return points;
+}
+
+/**
  * Bond-tent glide path: flat at `preEquity` until `deRiskStartAge`, declines
  * linearly to `troughEquity` at `retirementAge` (the tent's trough), then
  * rises linearly back to `postEquity` by `driftEndAge`, flat afterward.

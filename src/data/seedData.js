@@ -10,6 +10,7 @@ export const seedData = {
     nestEggGoal: "",
     withdrawalRate: 4.0,
     annualSpending: "",
+    otherAnnualIncome: "",
     lastStructuralReview: "",
     glidePath: {
       deRiskStartAge: 54,
