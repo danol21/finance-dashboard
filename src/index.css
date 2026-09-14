@@ -855,6 +855,17 @@ textarea {
   }
 }
 
+.snapshot-notes {
+  margin: 0.9rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.stat[title] {
+  cursor: help;
+}
+
 /* Live snapshot login */
 .snapshot-login {
   display: flex;

@@ -100,13 +100,19 @@ export default function LiveSnapshotPanel({ status, snapshot, onLogin, onLogout 
         diagnostics.totalFeesTrailingYear !== undefined) && (
         <div className="retire-results" style={{ marginBottom: "1.5rem" }}>
           {diagnostics.idleCashPct !== undefined && (
-            <div className="stat">
+            <div
+              className="stat"
+              title="Share of your Traditional IRA + Roth IRA + 401(k) balance sitting in cash or a money-market fund instead of invested. Cash doesn't benefit from tax-advantaged compounding, so lower is generally better here."
+            >
               <span className="stat-label">Idle cash (tax-advantaged accounts)</span>
               <span className="stat-value">{diagnostics.idleCashPct.toFixed(1)}%</span>
             </div>
           )}
           {diagnostics.alphaVsBenchmarkPct !== undefined && (
-            <div className={`stat ${diagnostics.alphaVsBenchmarkPct >= 0 ? "stat-positive" : "stat-negative"}`}>
+            <div
+              className={`stat ${diagnostics.alphaVsBenchmarkPct >= 0 ? "stat-positive" : "stat-negative"}`}
+              title="How your actual trailing-12-month return compares to a benchmark with a similar stock/bond mix. Negative (red) means you returned less than that benchmark over the period; positive (green) means you beat it. This reflects your whole portfolio, not any single fund — see the note below for what's actually driving it."
+            >
               <span className="stat-label">Alpha vs. benchmark (trailing 12mo)</span>
               <span className="stat-value">
                 {diagnostics.alphaVsBenchmarkPct >= 0 ? "+" : ""}
@@ -115,14 +121,17 @@ export default function LiveSnapshotPanel({ status, snapshot, onLogin, onLogout 
             </div>
           )}
           {diagnostics.totalFeesTrailingYear !== undefined && (
-            <div className="stat">
+            <div
+              className="stat"
+              title="Total account and fund fees actually charged across all linked accounts over the trailing 12 months, as reported by Truthifi. Doesn't include expense ratios Truthifi can't see for certain institutional/401(k) funds — see Fund & Fee Review below for what's known there."
+            >
               <span className="stat-label">Total fees (trailing 12mo)</span>
               <span className="stat-value">{formatCurrencyPrecise(diagnostics.totalFeesTrailingYear)}</span>
             </div>
           )}
         </div>
       )}
-      {diagnostics.notes && <p className="glide-caption">{diagnostics.notes}</p>}
+      {diagnostics.notes && <p className="snapshot-notes">{diagnostics.notes}</p>}
 
       {accounts.length > 0 && (
         <div className="fund-holdings" style={{ marginTop: "1rem" }}>
