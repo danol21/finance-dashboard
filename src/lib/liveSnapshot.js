@@ -81,11 +81,29 @@ export function deriveSnapshotHoldingRows(snapshot) {
   );
 }
 
-// Manual accounts are dropped once a synced account with the same name exists,
-// so the two never double-count in totals. Matching is by name only — rename
-// a manual account to stop it being treated as the synced version's duplicate.
+// Manual accounts are dropped once a synced account with a matching name
+// exists, so the two never double-count in totals. Names rarely match
+// character-for-character — Truthifi's institution nickname often has extra
+// words a hand-typed name doesn't ("Individual - TOD" vs "Individual - TOD
+// Brokerage") — so matching normalizes punctuation/case and treats either
+// name containing the other as the same account, not just exact equality.
+function normalizeAccountName(name) {
+  return (name ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function namesMatch(manualName, syncedName) {
+  const a = normalizeAccountName(manualName);
+  const b = normalizeAccountName(syncedName);
+  if (!a || !b) return false;
+  return a === b || a.includes(b) || b.includes(a);
+}
+
 export function mergeAccounts(manualAccounts, syncedAccounts) {
-  const syncedNames = new Set(syncedAccounts.map((a) => a.name.trim().toLowerCase()));
-  const manualKept = manualAccounts.filter((a) => !syncedNames.has((a.name ?? "").trim().toLowerCase()));
+  const manualKept = manualAccounts.filter(
+    (a) => !syncedAccounts.some((s) => namesMatch(a.name, s.name))
+  );
   return [...manualKept, ...syncedAccounts];
 }

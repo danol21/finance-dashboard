@@ -64,13 +64,23 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
         <table className="ledger-table">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Institution</th>
-              <th>Type</th>
-              <th>Fund</th>
-              <th className="col-num">Balance</th>
-              <th className="col-num">Monthly</th>
-              <th>Notes</th>
+              <th title="Account label. For a synced row this comes from Truthifi — a manual account whose name matches (even partially) is automatically hidden below to avoid double-counting.">
+                Name
+              </th>
+              <th title="Where the account is held.">Institution</th>
+              <th title="Tax treatment of the account. Drives which panels apply — e.g. only 401(k)/403(b) get an employee/employer contribution split, and only Traditional/Roth IRA count toward the IRA limit.">
+                Type
+              </th>
+              <th title="Ticker of the fund held here (e.g. FZROX). Used by Fund & Fee Review to look up its expense ratio.">
+                Fund
+              </th>
+              <th className="col-num" title="Current balance. Synced rows update automatically from Truthifi; manual rows need to be updated by hand.">
+                Balance
+              </th>
+              <th className="col-num" title="Monthly contribution used in the Retirement Projection. 401(k)/403(b) split into EE (your contribution) and ER (employer match); Truthifi can't see this, so it's always entered/edited here even for synced accounts.">
+                Monthly
+              </th>
+              <th title="Free-text notes.">Notes</th>
               <th aria-label="Actions"></th>
             </tr>
           </thead>
@@ -83,6 +93,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                     value={a.name}
                     onChange={(e) => updateRow(a.id, "name", e.target.value)}
                     placeholder="Account name"
+                    title={a.name || undefined}
                   />
                 </td>
                 <td>
@@ -91,6 +102,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                     value={a.institution}
                     onChange={(e) => updateRow(a.id, "institution", e.target.value)}
                     placeholder="Institution"
+                    title={a.institution || undefined}
                   />
                 </td>
                 <td>
@@ -166,6 +178,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                     value={a.notes}
                     onChange={(e) => updateRow(a.id, "notes", e.target.value)}
                     placeholder="Notes"
+                    title={a.notes || undefined}
                   />
                 </td>
                 <td>
@@ -184,19 +197,39 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
             {syncedAccounts.map((a) => (
               <tr key={a.id} className="ledger-row-synced">
                 <td>
-                  <input className="cell-input" value={a.name} disabled title="Synced via Truthifi" />
+                  <input
+                    className="cell-input"
+                    value={a.name}
+                    disabled
+                    title={`${a.name} — synced via Truthifi. Rename or remove a manual account with a matching name to change what's hidden here.`}
+                  />
                 </td>
                 <td>
-                  <input className="cell-input" value={a.institution} disabled />
+                  <input
+                    className="cell-input"
+                    value={a.institution}
+                    disabled
+                    title="Managed automatically from your Truthifi connection, not editable here."
+                  />
                 </td>
                 <td>
-                  <input className="cell-input" value={a.type} disabled />
+                  <input
+                    className="cell-input"
+                    value={a.type}
+                    disabled
+                    title={`Inferred from the account name as ${a.type}. If that's wrong, this account's Contribution Limits / elective-deferral handling will be wrong too — flag it for a fix.`}
+                  />
                 </td>
                 <td>
-                  <input className="cell-input" value={a.fund} disabled title={a.fund} />
+                  <input className="cell-input" value={a.fund} disabled title={a.fund || "No holdings reported."} />
                 </td>
                 <td className="col-num">
-                  <input className="cell-input cell-num" value={formatCurrencyPrecise(num(a.balance))} disabled />
+                  <input
+                    className="cell-input cell-num"
+                    value={formatCurrencyPrecise(num(a.balance))}
+                    disabled
+                    title="Live balance from Truthifi, updated on each sync."
+                  />
                 </td>
                 <td className="col-num">
                   {isElectiveDeferralType(a.type) ? (
