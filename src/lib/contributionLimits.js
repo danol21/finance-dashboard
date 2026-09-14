@@ -9,22 +9,22 @@ import { num } from "./finance";
 export const LIMIT_CATEGORIES = [
   {
     key: "limit401k",
-    label: "401(k) elective deferral",
+    label: "401(k)/403(b) — your own contributions",
     matchTypes: ["401(k)", "403(b)"],
     employeeOnly: true,
     secondary: {
       key: "limit415c",
-      label: "415(c) combined (employee + employer)",
+      label: "Combined 401(k)/403(b) cap (you + employer match)",
     },
   },
   {
     key: "limitIRA",
-    label: "IRA (Traditional + Roth combined)",
+    label: "IRA (Traditional + Roth added together)",
     matchTypes: ["Traditional IRA", "Roth IRA"],
   },
   {
     key: "limitHSA",
-    label: "Family HSA",
+    label: "Health Savings Account (Family)",
     matchTypes: ["HSA"],
   },
 ];
@@ -32,14 +32,14 @@ export const LIMIT_CATEGORIES = [
 export const SHORTFALL_THRESHOLD = 0.85;
 
 export function statusFor(annualPace, limit, monthsRemaining) {
-  if (limit <= 0) return { key: "none", emoji: "🟢", label: "No limit set" };
+  if (limit <= 0) return { key: "none", emoji: "🟢", label: "No limit set yet" };
   if (annualPace > limit) {
-    return { key: "act", emoji: "🔴", label: "Projected to exceed limit" };
+    return { key: "act", emoji: "🔴", label: "On track to go over the limit — lower it" };
   }
   if (monthsRemaining > 0 && annualPace < limit * SHORTFALL_THRESHOLD) {
-    return { key: "watch", emoji: "🟡", label: "On pace to fall meaningfully short" };
+    return { key: "watch", emoji: "🟡", label: "On track to put in a lot less than you're allowed" };
   }
-  return { key: "none", emoji: "🟢", label: "On track" };
+  return { key: "none", emoji: "🟢", label: "Right on track" };
 }
 
 // Employee-only monthly figure: for 401(k)/403(b) accounts the elective-deferral
@@ -72,11 +72,11 @@ export function worstContributionSuggestion(limits, accounts) {
   const statuses = computeLimitStatuses(limits, accounts);
   const flagged = statuses.find((s) => s.status.key === "act");
   if (flagged) {
-    return { status: "flagged", reason: `${flagged.label} is projected to exceed its limit` };
+    return { status: "flagged", reason: `${flagged.label} is on track to go over this year's limit` };
   }
   const watch = statuses.find((s) => s.status.key === "watch");
   if (watch) {
-    return { status: "watch", reason: `${watch.label} is on pace to fall meaningfully short` };
+    return { status: "watch", reason: `${watch.label} is on pace to put in a lot less than you're allowed` };
   }
   return null;
 }

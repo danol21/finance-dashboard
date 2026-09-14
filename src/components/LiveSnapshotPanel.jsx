@@ -91,8 +91,8 @@ export default function LiveSnapshotPanel({ status, snapshot, onLogin, onLogout 
         </button>
       </div>
       <p className="fund-caption">
-        Last synced {formatSyncedAt(syncedAt)} — balances below now feed your Retirement Projection
-        and Fund &amp; Fee Review automatically.
+        Last updated {formatSyncedAt(syncedAt)} — balances below automatically feed your Retirement
+        Savings Forecast and fee check further down the page.
       </p>
 
       {(diagnostics.idleCashPct !== undefined ||
@@ -102,18 +102,18 @@ export default function LiveSnapshotPanel({ status, snapshot, onLogin, onLogout 
           {diagnostics.idleCashPct !== undefined && (
             <div
               className="stat"
-              title="Share of your Traditional IRA + Roth IRA + 401(k) balance sitting in cash or a money-market fund instead of invested. Cash doesn't benefit from tax-advantaged compounding, so lower is generally better here."
+              title="What % of your Traditional IRA + Roth IRA + 401(k) money is just sitting in cash instead of invested. Cash sitting in a retirement account misses out on growth, so lower is generally better here — this is usually worth fixing."
             >
-              <span className="stat-label">Idle cash (tax-advantaged accounts)</span>
+              <span className="stat-label">Uninvested cash sitting in retirement accounts</span>
               <span className="stat-value">{diagnostics.idleCashPct.toFixed(1)}%</span>
             </div>
           )}
           {diagnostics.alphaVsBenchmarkPct !== undefined && (
             <div
               className={`stat ${diagnostics.alphaVsBenchmarkPct >= 0 ? "stat-positive" : "stat-negative"}`}
-              title="How your actual trailing-12-month return compares to a benchmark with a similar stock/bond mix. Negative (red) means you returned less than that benchmark over the period; positive (green) means you beat it. This reflects your whole portfolio, not any single fund — see the note below for what's actually driving it."
+              title="Compares your actual return over the last 12 months to a typical benchmark with a similar stock/bond mix — a rough 'how did I do' check. Red (negative) means you earned less than that benchmark over the period; green (positive) means you beat it. This is your whole portfolio combined, not any one fund."
             >
-              <span className="stat-label">Alpha vs. benchmark (trailing 12mo)</span>
+              <span className="stat-label">How you did vs. a typical benchmark (last 12mo)</span>
               <span className="stat-value">
                 {diagnostics.alphaVsBenchmarkPct >= 0 ? "+" : ""}
                 {diagnostics.alphaVsBenchmarkPct.toFixed(1)}%
@@ -123,9 +123,9 @@ export default function LiveSnapshotPanel({ status, snapshot, onLogin, onLogout 
           {diagnostics.totalFeesTrailingYear !== undefined && (
             <div
               className="stat"
-              title="Total account and fund fees actually charged across all linked accounts over the trailing 12 months, as reported by Truthifi. Doesn't include expense ratios Truthifi can't see for certain institutional/401(k) funds — see Fund & Fee Review below for what's known there."
+              title="Total account and fund fees actually charged across everything linked here over the last 12 months. Doesn't include fees on certain 401(k) funds this connection can't see — check What Your Investments Are Costing You in Fees, further down, for what's known there."
             >
-              <span className="stat-label">Total fees (trailing 12mo)</span>
+              <span className="stat-label">Total fees charged (last 12mo)</span>
               <span className="stat-value">{formatCurrencyPrecise(diagnostics.totalFeesTrailingYear)}</span>
             </div>
           )}

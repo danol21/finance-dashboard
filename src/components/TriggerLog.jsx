@@ -56,10 +56,10 @@ export default function TriggerLog({ triggers, onChange }) {
   return (
     <section className="panel">
       <div className="panel-header-row">
-        <h2 className="panel-title" title="A running history of things worth acting on or keeping an eye on — some added automatically by the monthly scan, some added by hand.">
-          Trigger Log
+        <h2 className="panel-title" title="A running list of things worth acting on or keeping an eye on — some get added here automatically, and you can add your own too.">
+          Things to Act On or Watch
         </h2>
-        <button className="btn btn-ghost" onClick={addEntry} type="button" title="Log a new finding by hand.">
+        <button className="btn btn-ghost" onClick={addEntry} type="button" title="Add something to this list by hand.">
           + Add entry
         </button>
       </div>

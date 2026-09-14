@@ -44,9 +44,9 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
   }
 
   const markers = [
-    { age: gp.deRiskStartAge, label: "De-risk starts", key: "start" },
-    { age: retirementAge, label: "Retirement (trough)", key: "trough" },
-    { age: gp.driftEndAge, label: "Drift-back complete", key: "end" },
+    { age: gp.deRiskStartAge, label: "Start playing it safer", key: "start" },
+    { age: retirementAge, label: "Retirement (safest point)", key: "trough" },
+    { age: gp.driftEndAge, label: "Back to normal mix", key: "end" },
   ];
   if (selfCurrentAge !== null && selfCurrentAge >= xMin && selfCurrentAge <= xMax) {
     markers.push({ age: selfCurrentAge, label: "Today", key: "today", isToday: true });
@@ -56,27 +56,33 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
     <section className="panel">
       <h2
         className="panel-title"
-        title="A plan for how much of your portfolio stays in stocks vs. bonds/cash as you get closer to and then live through retirement — riskier while young, more protected right around retirement, then gradually riskier again since retirement can last decades."
+        title="Stocks tend to grow more over time but can drop suddenly; bonds/cash grow more slowly but are steadier. This is a plan for shifting the mix between the two as retirement gets closer, so a bad stock-market year right before you retire doesn't wreck your plans — then easing back into stocks during a retirement that could last decades."
       >
-        Glide Path (Bond Tent)
+        Playing It Safer As You Age (Risk Plan)
       </h2>
+      <p className="fund-caption">
+        The idea: stay mostly in stocks while retirement is far off, shift toward safer bonds/cash
+        as you approach retirement (so a market crash right before you stop working doesn't wreck
+        your plans), then gradually add stocks back since a long retirement still needs growth.
+        Investing folks sometimes call this a "glide path" or "bond tent" — same thing.
+      </p>
 
       <div className="retire-grid glide-grid">
         <div className="field">
-          <label htmlFor="gp-start" title="The age at which you start shifting money from stocks into bonds/cash, ahead of retirement.">
-            De-risk start age
+          <label htmlFor="gp-start" title="The age you start moving some money out of stocks and into safer bonds/cash, ahead of retirement.">
+            Age you start playing it safer
           </label>
           <input
             id="gp-start"
             type="number"
             value={glidePath.deRiskStartAge}
             onChange={set("deRiskStartAge")}
-            title="Age to start gradually reducing stock exposure."
+            title="Age to start gradually shifting out of stocks."
           />
         </div>
         <div className="field">
-          <label htmlFor="gp-pre" title="Your stock allocation before de-risking begins — typically high, since retirement is still far off.">
-            Pre-de-risk equity (%)
+          <label htmlFor="gp-pre" title="What % of your portfolio is in stocks before you start playing it safer — usually high, since retirement is still far off and there's time to recover from a downturn.">
+            % in stocks before then
           </label>
           <input
             id="gp-pre"
@@ -84,12 +90,12 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
             step="1"
             value={glidePath.preEquity}
             onChange={set("preEquity")}
-            title="% of your portfolio in stocks before de-risking starts."
+            title="% of your portfolio in stocks before you start playing it safer."
           />
         </div>
         <div className="field">
-          <label htmlFor="gp-trough" title="Your lowest planned stock allocation, reached right at retirement — the most protected point, since a market drop right before you start withdrawing does the most damage.">
-            Trough equity at retirement (%)
+          <label htmlFor="gp-trough" title="Your lowest planned % in stocks, reached right when you retire — your most protected point, since a market drop right before you start withdrawing money does the most damage.">
+            % in stocks right when you retire (safest point)
           </label>
           <input
             id="gp-trough"
@@ -97,24 +103,24 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
             step="1"
             value={glidePath.troughEquity}
             onChange={set("troughEquity")}
-            title="% of your portfolio in stocks at the moment you retire — your most conservative point."
+            title="% of your portfolio in stocks at the moment you retire — your most cautious point."
           />
         </div>
         <div className="field">
-          <label htmlFor="gp-end-age" title="The age by which you finish gradually increasing stocks again after retirement, since a multi-decade retirement still needs growth.">
-            Drift-back complete by age
+          <label htmlFor="gp-end-age" title="The age by which you finish gradually adding stocks back after retirement, since a retirement lasting decades still needs some growth.">
+            Age you're back to a normal mix
           </label>
           <input
             id="gp-end-age"
             type="number"
             value={glidePath.driftEndAge}
             onChange={set("driftEndAge")}
-            title="Age by which your stock allocation finishes rising back up after retirement."
+            title="Age by which your % in stocks finishes rising back up after retirement."
           />
         </div>
         <div className="field">
-          <label htmlFor="gp-post" title="Your stock allocation once drift-back is complete — usually higher than the retirement trough, to keep growing through a long retirement.">
-            Target equity by then (%)
+          <label htmlFor="gp-post" title="Your % in stocks once you're back to a normal mix — usually higher than right at retirement, to keep growing through what could be a decades-long retirement.">
+            % in stocks at that point
           </label>
           <input
             id="gp-post"
@@ -122,7 +128,7 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
             step="1"
             value={glidePath.postEquity}
             onChange={set("postEquity")}
-            title="% of your portfolio in stocks once drift-back is complete."
+            title="% of your portfolio in stocks once you're back to a normal mix."
           />
         </div>
       </div>
@@ -190,10 +196,11 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
         </svg>
       </div>
       <p className="glide-caption">
-        Equity allocation by age: flat at {gp.preEquity}% until {gp.deRiskStartAge}, tenting down to{" "}
-        {gp.troughEquity}% at retirement (age {retirementAge}), then drifting back up to {gp.postEquity}%
-        by age {gp.driftEndAge} as the bond floor is spent down. Build the bond sleeve inside tax-advantaged
-        accounts (401(k)) to avoid realizing gains in the taxable brokerage.
+        In plain terms: stay at {gp.preEquity}% in stocks until age {gp.deRiskStartAge}, then gradually
+        shift down to {gp.troughEquity}% in stocks by the time you retire (age {retirementAge}) — your
+        safest point. After that, gradually add stocks back up to {gp.postEquity}% by age {gp.driftEndAge}{" "}
+        as you spend down the safer portion. When you do shift into bonds, doing it inside your 401(k)
+        rather than a regular brokerage account avoids an extra tax bill from selling investments there.
       </p>
     </section>
   );
