@@ -1,4 +1,4 @@
-import { num, effectiveMonthly } from "./finance";
+import { num } from "./finance";
 
 // Shared with ContributionLimitsPanel and Structural Health so the two can
 // never silently disagree — Structural Health used to only reflect
