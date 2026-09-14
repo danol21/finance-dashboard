@@ -55,11 +55,11 @@
   },
   {
     "id": "401k-safe-harbor-trueup-check-2026-09",
-    "date": "2026-09-13",
-    "source": "Analysis of employer pay stub + Truthifi transaction history",
+    "date": "2026-09-15",
+    "source": "Analysis of employer pay stub (pay date 09/15/2026) + Truthifi transaction history",
     "url": "",
     "rating": "🔴",
-    "summary": "CONFIRMED 2026-09-13 via year-end 2025 and first-2026-paycheck pay stubs: this plan has no true-up provision. Employee elective deferrals and the employer Safe Harbor contribution both stopped in the same pay period once the 2025 annual limit was hit, stayed flat through the final paycheck of the year, and simply restarted fresh in January 2026 — no catch-up payment appeared at year-end or in the new year. In 2025 this cost roughly one pay period's worth of Safe Harbor since the limit wasn't hit until very late in the year. In 2026, a mid-year raise means the same elective percentage now hits the (higher, unchanged-in-dollar-terms) annual limit far earlier — on pace for roughly 7 pay periods with zero Safe Harbor by year-end, a materially larger forfeiture than 2025's.",
-    "suggestedAction": "No further verification needed — this is now a confirmed, structural fact about the plan, not a hypothesis. The only lever available is contribution pacing: reduce the per-paycheck elective percentage (for the remainder of 2026 if payroll allows a mid-year change, and for 2027 regardless) so the annual limit is reached in the final pay period of the year rather than mid-year, capturing the full employer Safe Harbor match every year going forward."
+    "summary": "CONFIRMED via the 09/15/2026 pay stub: combined YTD employee elective deferrals (pre-tax 401K Mep $18,861.34 + Roth 401K Mep $5,638.66) hit the $24,500 annual limit exactly on this paycheck — the 18th of 24 semi-monthly pay periods in 2026. This plan has no true-up provision (confirmed via year-end 2025 and first-2026-paycheck pay stubs: deferrals and the Safe Harbor match both stopped together when the 2025 limit was hit and simply restarted in January with no catch-up). With deferrals now at $0 for the rest of the year, the remaining 7 pay periods (9/30, 10/15, 10/31, 11/15, 11/30, 12/15, 12/31) will each pay $0 Safe Harbor match instead of the current $241.68/period — a forfeiture of roughly $1,692 for the remainder of 2026, on top of whatever was lost in 2025.",
+    "suggestedAction": "No further verification needed — confirmed, not projected. The only lever available is contribution pacing: for 2027, lower the per-paycheck elective percentage so the $24,500 (or whatever the 2027 limit is) is reached in the final pay period of the year instead of mid-year, capturing the full employer Safe Harbor match. Nothing to do for the remaining 2026 periods — the shortfall is already locked in."
   }
 ]
