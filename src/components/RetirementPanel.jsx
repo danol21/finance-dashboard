@@ -316,7 +316,12 @@ function GrowthChart({ series, goal, hoverAge, onHoverAge }) {
   }
 
   const formatCompact = (v) =>
-    new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 1 }).format(v);
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(v);
 
   const handleMove = (e) => {
     const svg = svgRef.current;
