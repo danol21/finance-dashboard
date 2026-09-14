@@ -286,9 +286,15 @@ textarea {
 .ledger-table td:nth-child(4) {
   width: 10%;
 }
+.ledger-table th:nth-child(6),
+.ledger-table td:nth-child(6) {
+  /* Wide enough for the EE/ER label plus a dollar value without forcing the
+     input inside it to overflow into the Notes column. */
+  width: 15%;
+}
 .ledger-table th:nth-child(7),
 .ledger-table td:nth-child(7) {
-  width: 20%;
+  width: 18%;
 }
 
 .ledger-table th {
@@ -310,7 +316,11 @@ textarea {
 .ledger-table td {
   padding: 0.35rem 0.6rem;
   border-bottom: 1px solid rgba(42, 49, 64, 0.5);
-  vertical-align: middle;
+  /* Top-aligned, not middle: the Monthly column can be two lines tall (EE/ER
+     split), and middle-aligning every other column against that height put
+     Name/Institution/Balance/Notes at the row's vertical midpoint — landing
+     Notes text visually between the EE and ER lines instead of beside EE. */
+  vertical-align: top;
 }
 
 .ledger-table .col-num {
@@ -359,13 +369,31 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  min-width: 130px;
+  /* No min-width here: the Monthly column itself is only ~12-14% of the
+     table, so a fixed min-width wider than that (this used to say 130px)
+     forced the row wider than its cell, which is exactly what let the EE/ER
+     input below overflow into the Notes column. */
+  width: 100%;
 }
 
 .split-monthly-row {
   display: flex;
   align-items: center;
   gap: 0.35rem;
+  /* Without min-width: 0, a flex child's default min-width is its content's
+     natural size — for a text input that can be wider than the space
+     actually available, which pushed it past the row's right edge and over
+     the Notes column next to it. */
+  min-width: 0;
+}
+
+.split-monthly-row .cell-input {
+  /* Flex to fill remaining space after the EE/ER label, instead of the
+     inherited width: 100% (of the flex container, ignoring the label's
+     space) that caused the overflow described above. */
+  width: auto;
+  flex: 1;
+  min-width: 0;
 }
 
 .split-monthly-label {
