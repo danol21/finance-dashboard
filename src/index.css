@@ -54,10 +54,24 @@ textarea {
 .app-shell {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
+  padding: 1.5rem 1.5rem 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1.75rem;
+  gap: 1.25rem;
+  /* Pins the whole app to the browser window — the header, tab bar, and
+     footer stay fixed, and only the active tab's own content scrolls (see
+     .tab-panel) when it has more in it than fits. 100dvh (falls back to
+     100vh where unsupported) accounts for mobile browser chrome that
+     100vh alone can end up hidden behind. */
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+.app-header,
+.tab-bar,
+.app-footer {
+  flex-shrink: 0;
 }
 
 .app-header {
@@ -129,13 +143,30 @@ textarea {
   border-color: var(--gold-dim, var(--gold));
 }
 
+/* Fills whatever vertical space is left under the header/tab bar/footer —
+   min-height: 0 is what actually lets a flex child shrink below its
+   content's natural size instead of forcing the whole page to grow past
+   the window, which is the one line that makes the fixed-height app-shell
+   above actually work rather than just clipping content. */
+.app-main {
+  flex: 1;
+  min-height: 0;
+}
+
 /* Each tab's content pane — .app-main itself has no gap of its own, since
    only one pane is ever visible at a time (the rest sit [hidden]), so the
-   gap between panels has to live here rather than on .app-main. */
+   gap between panels has to live here rather than on .app-main. Scrolls
+   internally (rather than the whole page) when a tab has more in it than
+   fits the window — the outer app frame (header, tabs, footer) never moves. */
 .tab-panel {
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 0.5rem;
+  margin-right: -0.5rem;
 }
 
 /* Needs its own rule (not just the browser default) because it must beat
