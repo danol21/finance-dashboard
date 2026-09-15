@@ -43,8 +43,8 @@ export default function LiveSnapshotPanel({ status, snapshot, onLogin, onLogout 
       <section className="panel">
         <h2 className="panel-title">Live Portfolio Snapshot</h2>
         <p className="fund-caption">
-          Sign in to view the latest synced balances and diagnostics from Truthifi, and to feed
-          them into your Retirement Projection and Fund &amp; Fee Review below.
+          Sign in to view your latest synced balances and account health checks, and to feed
+          them into your Retirement Savings Forecast and fee check below.
         </p>
         <form className="snapshot-login" onSubmit={handleLogin}>
           <input

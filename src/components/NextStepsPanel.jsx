@@ -9,7 +9,7 @@
 const HEALTH_DISPLAY = {
   "Fee drag": "Fees",
   "Allocation drift": "Investment Mix",
-  "Tax efficiency": "Right Account for the Job",
+  "Tax efficiency": "Right Account",
   "Contribution room": "Contribution Pace",
 };
 

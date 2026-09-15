@@ -1,4 +1,5 @@
-import { num, equityAllocationAt } from "../lib/finance";
+import { num } from "../lib/finance";
+import { smoothPathD, smoothAreaD } from "../lib/svgPath";
 
 export default function GlidePathPanel({ settings, glidePath, onChange }) {
   const retirementAge = num(settings.targetAge);
@@ -21,7 +22,10 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
 
   const plotLeft = 46;
   const plotRight = 744;
-  const plotTop = 20;
+  // Extra headroom above the plot (vs. a single label row) so two staggered
+  // rows of marker labels have room to not clip against the top edge — see
+  // the label-collision handling below.
+  const plotTop = 36;
   const plotBottom = 260;
   const plotWidth = plotRight - plotLeft;
   const plotHeight = plotBottom - plotTop;
@@ -29,12 +33,21 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
   const xScale = (age) => plotLeft + ((age - xMin) / (xMax - xMin)) * plotWidth;
   const yScale = (pct) => plotBottom - (pct / 100) * plotHeight;
 
-  const points = [];
-  for (let age = Math.floor(xMin); age <= Math.ceil(xMax); age++) {
-    points.push([xScale(age), yScale(equityAllocationAt(age, gp, retirementAge))]);
-  }
-  const linePoints = points.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
-  const areaPoints = `${plotLeft},${plotBottom} ${linePoints} ${plotRight},${plotBottom}`;
+  // This is exactly 4 straight-line segments (flat, ramp down, ramp up, flat)
+  // with 3 corners — so the curve only needs the 5 vertices, not one point
+  // per year. Using just the vertices (rather than ~40 densely-packed yearly
+  // points) gives the spline's rounding a much larger radius to work with at
+  // each corner, so it actually reads as a smooth curve instead of a barely-
+  // perceptible softening of a sharp V.
+  const points = [
+    [xScale(xMin), yScale(gp.preEquity)],
+    [xScale(gp.deRiskStartAge), yScale(gp.preEquity)],
+    [xScale(retirementAge), yScale(gp.troughEquity)],
+    [xScale(gp.driftEndAge), yScale(gp.postEquity)],
+    [xScale(xMax), yScale(gp.postEquity)],
+  ];
+  const linePath = smoothPathD(points);
+  const areaPath = smoothAreaD(points, plotLeft, plotRight, plotBottom);
 
   const yTicks = [0, 20, 40, 60, 80, 100];
   const xTickStep = xMax - xMin > 50 ? 10 : 5;
@@ -43,14 +56,43 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
     xTicks.push(age);
   }
 
-  const markers = [
+  const rawMarkers = [
     { age: gp.deRiskStartAge, label: "Start playing it safer", key: "start" },
     { age: retirementAge, label: "Retirement (safest point)", key: "trough" },
     { age: gp.driftEndAge, label: "Back to normal mix", key: "end" },
   ];
   if (selfCurrentAge !== null && selfCurrentAge >= xMin && selfCurrentAge <= xMax) {
-    markers.push({ age: selfCurrentAge, label: "Today", key: "today", isToday: true });
+    rawMarkers.push({ age: selfCurrentAge, label: "Today", key: "today", isToday: true });
   }
+
+  // Marker labels can land close enough together (e.g. de-risking starting
+  // just a few years before retirement) that centering each one on its own
+  // age-line makes adjacent labels overlap — and these labels vary a lot in
+  // length ("Today" vs. "Retirement (safest point)"), so a fixed pixel gap
+  // isn't enough; estimate each label's rendered width from its character
+  // count. Alternate labels onto a second, higher row whenever the gap since
+  // the last-placed label is smaller than both labels' half-widths (plus
+  // padding) combined, resetting back to the top row once there's room.
+  const AVG_CHAR_WIDTH_PX = 6.2; // rough glyph width at the marker label's ~11px font
+  const LABEL_PADDING_PX = 10;
+  const estLabelWidth = (label) => label.length * AVG_CHAR_WIDTH_PX;
+  const { placed: markers } = [...rawMarkers]
+    .sort((a, b) => a.age - b.age)
+    .reduce(
+      (acc, m) => {
+        const x = xScale(m.age);
+        const width = estLabelWidth(m.label);
+        const minGap = acc.lastWidth / 2 + width / 2 + LABEL_PADDING_PX;
+        const row = x - acc.lastX < minGap ? acc.nextRow : 0;
+        return {
+          placed: [...acc.placed, { ...m, row }],
+          lastX: x,
+          lastWidth: width,
+          nextRow: row === 0 ? 1 : 0,
+        };
+      },
+      { placed: [], lastX: -Infinity, lastWidth: 0, nextRow: 0 }
+    );
 
   return (
     <section className="panel">
@@ -167,8 +209,8 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
             </text>
           ))}
 
-          <polygon points={areaPoints} fill="var(--gold-soft, rgba(199,154,75,0.16))" />
-          <polyline points={linePoints} fill="none" stroke="var(--gold, #c79a4b)" strokeWidth="2.5" />
+          <path d={areaPath} fill="var(--gold-soft, rgba(199,154,75,0.16))" />
+          <path d={linePath} fill="none" stroke="var(--gold, #c79a4b)" strokeWidth="2.5" />
 
           {markers.map((m) => (
             <g key={m.key}>
@@ -183,7 +225,7 @@ export default function GlidePathPanel({ settings, glidePath, onChange }) {
               />
               <text
                 x={xScale(m.age)}
-                y={plotTop - 6}
+                y={m.row === 1 ? plotTop - 20 : plotTop - 6}
                 textAnchor="middle"
                 className={`glide-marker-label ${m.isToday ? "glide-marker-today" : ""}`}
               >

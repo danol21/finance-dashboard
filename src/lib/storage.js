@@ -67,6 +67,44 @@ const SEEDED_REMINDERS = [
     note: "The Q3 bonus lands on this check. At the current 1% pre-tax / 1% Roth election, confirm the bonus's own 401(k) withholding hasn't pushed YTD elective deferrals close enough to the $24,500 cap to risk losing Safe Harbor match on the Dec 15/31 checks — adjust December down if needed.",
     completed: false,
   },
+  // 2027 quarterly check-ins: the 11%/3% (14%) starting election for 2027 is
+  // a target-case estimate (assumes each quarterly bonus lands at its 19%/4
+  // target) intentionally rounded DOWN to the nearest whole percent — Voya
+  // only accepts whole-number elections, and undershooting is correctable
+  // (bump the % later) while overshooting risks re-hitting the $24,500 cap
+  // early and losing Safe Harbor match again, same as happened in 2026 (no
+  // true-up provision on this plan). Each date below is ~1.5 months after
+  // the quarter it's paying out for, matching the confirmed Q3'26-bonus ->
+  // Nov 15'26-paycheck lag. Recompute at each one: (24,500 - YTD deferred so
+  // far) / (remaining projected pay for the rest of the year) = new %.
+  {
+    id: "reminder-2027-feb-bonus-401k-check",
+    dueDate: "2027-02-16",
+    title: "Recheck 401(k) pacing after the Q4 2026 bonus paycheck",
+    note: "First checkpoint on the 2027 pace (started the year at 11% pre-tax / 3% Roth). Compare actual YTD elective deferrals to (24,500 - YTD) / (remaining 2027 pay) and adjust the % up if this bonus came in below its ~4.75%-of-salary target, so you don't drift short of the $24,500 cap by December.",
+    completed: false,
+  },
+  {
+    id: "reminder-2027-may-bonus-401k-check",
+    dueDate: "2027-05-16",
+    title: "Recheck 401(k) pacing after the Q1 2027 bonus paycheck",
+    note: "Second checkpoint on the 2027 pace. Recompute (24,500 - YTD deferred) / (remaining 2027 pay) and adjust the % — up if bonuses have been running below the ~19%/yr target so far, down if they've been running above it and you're at risk of capping out before December.",
+    completed: false,
+  },
+  {
+    id: "reminder-2027-aug-bonus-401k-check",
+    dueDate: "2027-08-16",
+    title: "Recheck 401(k) pacing after the Q2 2027 bonus paycheck",
+    note: "Third checkpoint on the 2027 pace. Recompute (24,500 - YTD deferred) / (remaining 2027 pay) and adjust the % — up if bonuses have been running below the ~19%/yr target so far, down if they've been running above it and you're at risk of capping out before December.",
+    completed: false,
+  },
+  {
+    id: "reminder-2027-nov-bonus-401k-check",
+    dueDate: "2027-11-16",
+    title: "Recheck 401(k) pacing after the Q3 2027 bonus paycheck",
+    note: "Final checkpoint before year-end — only the Dec 15/31 paychecks are left after this one. Recompute (24,500 - YTD deferred) / (remaining 2027 pay, i.e. those two checks) and set the % precisely so December lands at or just under $24,500, without capping out early and losing Safe Harbor match on the last check(s).",
+    completed: false,
+  },
 ];
 
 function ensureSeededReminders(reminders) {
@@ -78,7 +116,9 @@ function ensureSeededReminders(reminders) {
 export function loadData() {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return structuredClone(seedData);
+    if (!raw) {
+      return { ...structuredClone(seedData), reminders: ensureSeededReminders(seedData.reminders) };
+    }
     const parsed = JSON.parse(raw);
     return {
       settings: {

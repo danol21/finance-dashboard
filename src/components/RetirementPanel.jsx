@@ -8,6 +8,7 @@ import {
   formatCurrency,
   formatCurrencyPrecise,
 } from "../lib/finance";
+import { smoothPathD, smoothAreaD } from "../lib/svgPath";
 
 export default function RetirementPanel({ settings, onChange, accounts }) {
   const [hoverAge, setHoverAge] = useState(null);
@@ -314,8 +315,9 @@ function GrowthChart({ series, goal, hoverAge, onHoverAge }) {
   const xScale = (age) => plotLeft + ((age - startAge) / Math.max(endAge - startAge, 1)) * plotWidth;
   const yScale = (balance) => plotBottom - (balance / maxBalance) * plotHeight;
 
-  const linePoints = series.map((p) => `${xScale(p.age).toFixed(1)},${yScale(p.balance).toFixed(1)}`).join(" ");
-  const areaPoints = `${plotLeft},${plotBottom} ${linePoints} ${plotRight},${plotBottom}`;
+  const seriesPoints = series.map((p) => [xScale(p.age), yScale(p.balance)]);
+  const linePath = smoothPathD(seriesPoints);
+  const areaPath = smoothAreaD(seriesPoints, plotLeft, plotRight, plotBottom);
 
   const yTicks = [0, 0.25, 0.5, 0.75, 1].map((t) => t * maxBalance);
   const range = endAge - startAge;
@@ -383,8 +385,8 @@ function GrowthChart({ series, goal, hoverAge, onHoverAge }) {
           </text>
         ))}
 
-        <polygon points={areaPoints} fill="var(--gold-soft, rgba(199,154,75,0.16))" />
-        <polyline points={linePoints} fill="none" stroke="var(--gold, #c79a4b)" strokeWidth="2.5" />
+        <path d={areaPath} fill="var(--gold-soft, rgba(199,154,75,0.16))" />
+        <path d={linePath} fill="none" stroke="var(--gold, #c79a4b)" strokeWidth="2.5" />
 
         {goal != null && goal > 0 && goal <= maxBalance && (
           <g>
