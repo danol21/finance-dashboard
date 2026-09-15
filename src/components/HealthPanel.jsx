@@ -4,6 +4,15 @@ const STATUSES = [
   { value: "flagged", label: "Needs attention" },
 ];
 
+// Grows the textarea to fit its content instead of leaving longer notes
+// scrolling inside a fixed-height box that visually looks cut off next to
+// other cards' much-taller empty note areas.
+function autoResize(el) {
+  if (!el) return;
+  el.style.height = "auto";
+  el.style.height = `${el.scrollHeight}px`;
+}
+
 // These four strings are the actual storage keys for saved health/checklist
 // data (see seedData.js) — changing them would silently disconnect existing
 // saved statuses/notes from the categories shown here. Only the *display*
@@ -13,7 +22,7 @@ const CATEGORIES = ["Fee drag", "Allocation drift", "Tax efficiency", "Contribut
 const CATEGORY_DISPLAY = {
   "Fee drag": "Fees",
   "Allocation drift": "Investment Mix",
-  "Tax efficiency": "Right Account for the Job",
+  "Tax efficiency": "Right Account",
   "Contribution room": "Contribution Pace",
 };
 
@@ -129,7 +138,11 @@ export default function HealthPanel({ health, onChange, triggers = [], contribut
               <textarea
                 className="health-note"
                 value={entry.note}
-                onChange={(e) => updateCategory(category, "note", e.target.value)}
+                onChange={(e) => {
+                  autoResize(e.target);
+                  updateCategory(category, "note", e.target.value);
+                }}
+                ref={autoResize}
                 placeholder="Notes..."
                 rows={3}
                 title={entry.note || "Your own notes on why this is at its current status."}
