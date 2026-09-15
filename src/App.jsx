@@ -7,6 +7,7 @@ import TriggerLog from "./components/TriggerLog";
 import ContributionLimitsPanel from "./components/ContributionLimitsPanel";
 import QuarterlyChecklist from "./components/QuarterlyChecklist";
 import FindingsSync from "./components/FindingsSync";
+import SourcesPanel from "./components/SourcesPanel";
 import RemindersPanel from "./components/RemindersPanel";
 import GlidePathPanel from "./components/GlidePathPanel";
 import FundFeePanel from "./components/FundFeePanel";
@@ -15,9 +16,19 @@ import { loadData, saveData } from "./lib/storage";
 import { seedData } from "./data/seedData";
 import { deriveSyncedAccounts, deriveSnapshotHoldingRows, mergeAccounts } from "./lib/liveSnapshot";
 import { worstContributionSuggestion } from "./lib/contributionLimits";
+import { mergeSourceActivity } from "./lib/sourceActivity";
+
+const TABS = [
+  { id: "overview", label: "Overview" },
+  { id: "retirement", label: "Retirement Plan" },
+  { id: "accounts", label: "Accounts & Fees" },
+  { id: "contributions", label: "Contributions & Health" },
+  { id: "activity", label: "Activity Log" },
+];
 
 export default function App() {
   const [data, setData] = useState(() => loadData());
+  const [activeTab, setActiveTab] = useState("overview");
   const fileInputRef = useRef(null);
 
   const [snapshotStatus, setSnapshotStatus] = useState("loading");
@@ -106,6 +117,9 @@ export default function App() {
   const addTriggerFromFinding = (entry) =>
     setData((d) => ({ ...d, triggers: [entry, ...d.triggers] }));
 
+  const handleSyncComplete = (results, syncedAt) =>
+    setData((d) => ({ ...d, sourceActivity: mergeSourceActivity(d.sourceActivity, results, syncedAt) }));
+
   const markFindingReviewed = (id) =>
     setData((d) => ({
       ...d,
@@ -150,6 +164,7 @@ export default function App() {
           checklist: { ...seedData.checklist, ...parsed.checklist },
           reviewedFindingIds: parsed.reviewedFindingIds ?? data.reviewedFindingIds,
           syncedContributions: { ...data.syncedContributions, ...parsed.syncedContributions },
+          sourceActivity: { ...data.sourceActivity, ...parsed.sourceActivity },
           reminders: parsed.reminders ?? data.reminders,
         });
       } catch (err) {
@@ -195,59 +210,90 @@ export default function App() {
         </div>
       </header>
 
+      <nav className="tab-bar" role="tablist" aria-label="Dashboard sections">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            className={`tab-button ${activeTab === tab.id ? "tab-button-active" : ""}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
       <main className="app-main">
-        <NextStepsPanel
-          reminders={data.reminders}
-          triggers={data.triggers}
-          contributionSuggestion={contributionSuggestion}
-          health={data.health}
-        />
-        <RemindersPanel reminders={data.reminders} onChange={updateReminders} />
-        <FindingsSync
-          reviewedFindingIds={data.reviewedFindingIds}
-          onMarkReviewed={markFindingReviewed}
-          onAddTrigger={addTriggerFromFinding}
-        />
-        <LiveSnapshotPanel
-          status={snapshotStatus}
-          snapshot={snapshot}
-          onLogin={handleSnapshotLogin}
-          onLogout={handleSnapshotLogout}
-        />
-        <RetirementPanel
-          settings={data.settings}
-          onChange={updateSettings}
-          accounts={effectiveAccounts}
-        />
-        <GlidePathPanel
-          settings={data.settings}
-          glidePath={data.settings.glidePath}
-          onChange={updateGlidePath}
-        />
-        <AccountsTable
-          accounts={data.accounts}
-          onChange={updateAccounts}
-          syncedAccounts={syncedAccounts}
-          onUpdateSyncedContribution={updateSyncedContribution}
-        />
-        <FundFeePanel
-          accounts={data.accounts}
-          snapshotHoldings={snapshotHoldings}
-          settings={data.settings}
-        />
-        <ContributionLimitsPanel
-          limits={data.settings.contributionLimits}
-          accounts={effectiveAccounts}
-          onChange={updateContributionLimits}
-        />
-        <HealthPanel
-          health={data.health}
-          onChange={updateHealth}
-          triggers={data.triggers}
-          contributionSuggestion={contributionSuggestion}
-        />
-        <QuarterlyChecklist checklist={data.checklist} onChange={updateChecklist} />
-        <TriggerLog triggers={data.triggers} onChange={updateTriggers} />
+        <div className="tab-panel" hidden={activeTab !== "overview"}>
+          <NextStepsPanel
+            reminders={data.reminders}
+            triggers={data.triggers}
+            contributionSuggestion={contributionSuggestion}
+            health={data.health}
+          />
+          <RemindersPanel reminders={data.reminders} onChange={updateReminders} />
+          <LiveSnapshotPanel
+            status={snapshotStatus}
+            snapshot={snapshot}
+            onLogin={handleSnapshotLogin}
+            onLogout={handleSnapshotLogout}
+          />
+        </div>
+
+        <div className="tab-panel" hidden={activeTab !== "retirement"}>
+          <RetirementPanel
+            settings={data.settings}
+            onChange={updateSettings}
+            accounts={effectiveAccounts}
+          />
+          <GlidePathPanel
+            settings={data.settings}
+            glidePath={data.settings.glidePath}
+            onChange={updateGlidePath}
+          />
+        </div>
+
+        <div className="tab-panel" hidden={activeTab !== "accounts"}>
+          <AccountsTable
+            accounts={data.accounts}
+            onChange={updateAccounts}
+            syncedAccounts={syncedAccounts}
+            onUpdateSyncedContribution={updateSyncedContribution}
+          />
+          <FundFeePanel
+            accounts={data.accounts}
+            snapshotHoldings={snapshotHoldings}
+            settings={data.settings}
+          />
+        </div>
+
+        <div className="tab-panel" hidden={activeTab !== "contributions"}>
+          <ContributionLimitsPanel
+            limits={data.settings.contributionLimits}
+            accounts={effectiveAccounts}
+            onChange={updateContributionLimits}
+          />
+          <HealthPanel
+            health={data.health}
+            onChange={updateHealth}
+            triggers={data.triggers}
+            contributionSuggestion={contributionSuggestion}
+          />
+          <QuarterlyChecklist checklist={data.checklist} onChange={updateChecklist} />
+        </div>
+
+        <div className="tab-panel" hidden={activeTab !== "activity"}>
+          <FindingsSync
+            reviewedFindingIds={data.reviewedFindingIds}
+            onMarkReviewed={markFindingReviewed}
+            onAddTrigger={addTriggerFromFinding}
+            onSyncComplete={handleSyncComplete}
+          />
+          <TriggerLog triggers={data.triggers} onChange={updateTriggers} />
+          <SourcesPanel sourceActivity={data.sourceActivity} triggers={data.triggers} />
+        </div>
       </main>
 
       <footer className="app-footer">
