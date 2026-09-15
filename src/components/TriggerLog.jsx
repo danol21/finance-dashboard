@@ -85,7 +85,7 @@ export default function TriggerLog({ triggers, onChange }) {
                 className="cell-input trigger-category"
                 value={t.category}
                 onChange={(e) => updateEntry(t.id, "category", e.target.value)}
-                title="What kind of issue this is — used to group related findings and feed the Structural Health suggestions above."
+                title="What kind of issue this is — used to group related items and feed the suggestions in the Four Things Worth Checking On panel above."
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>
@@ -113,7 +113,7 @@ export default function TriggerLog({ triggers, onChange }) {
                 rows={2}
                 title={t.note || "What triggered this finding and what to do about it."}
               />
-              <label className="trigger-resolved-toggle" title="Check this off once you've dealt with it — it stays in the log but fades out and stops counting toward Structural Health suggestions.">
+              <label className="trigger-resolved-toggle" title="Check this off once you've dealt with it — it stays in the list but fades out and stops counting toward the suggestions in Four Things Worth Checking On.">
                 <input
                   type="checkbox"
                   checked={t.resolved}

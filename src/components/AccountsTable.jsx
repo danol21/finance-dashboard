@@ -79,13 +79,13 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
               <th title="Tax treatment of the account. Drives which panels apply — e.g. only 401(k)/403(b) get an employee/employer contribution split, and only Traditional/Roth IRA count toward the IRA limit.">
                 Type
               </th>
-              <th title="Ticker of the fund held here (e.g. FZROX). Used by Fund & Fee Review to look up its expense ratio.">
+              <th title="Ticker symbol of the fund held here (e.g. FZROX). Used by the fee-check panel below to look up its yearly fee.">
                 Fund
               </th>
               <th className="col-num" title="Current balance. Synced rows update automatically from Truthifi; manual rows need to be updated by hand.">
                 Balance
               </th>
-              <th className="col-num" title="Monthly contribution used in the Retirement Projection. 401(k)/403(b) split into EE (your contribution) and ER (employer match); Truthifi can't see this, so it's always entered/edited here even for synced accounts.">
+              <th className="col-num" title="Monthly contribution used in the Retirement Savings Forecast. For 401(k)/403(b) accounts this splits into EE (your own money) and ER (your employer's match) — Truthifi can't see this, so it's always entered/edited here even for synced accounts.">
                 Monthly
               </th>
               <th title="Free-text notes.">Notes</th>
@@ -133,7 +133,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                     value={a.fund ?? ""}
                     onChange={(e) => updateRow(a.id, "fund", e.target.value.toUpperCase())}
                     placeholder="e.g. FZROX"
-                    title="Ticker of the fund held in this account, for the Fund & Fee Review panel"
+                    title="Ticker symbol of the fund held in this account, for the fee-check panel below"
                   />
                 </td>
                 <td className="col-num">
@@ -179,7 +179,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                       value={a.monthly}
                       onChange={(e) => updateRow(a.id, "monthly", e.target.value)}
                       placeholder="0.00"
-                      title="Total monthly amount going into this account, used in the Retirement Projection."
+                      title="Total monthly amount going into this account, used in the Retirement Savings Forecast."
                     />
                   )}
                 </td>
@@ -228,7 +228,7 @@ export default function AccountsTable({ accounts, onChange, syncedAccounts = [],
                     className="cell-input"
                     value={a.type}
                     disabled
-                    title={`Inferred from the account name as ${a.type}. If that's wrong, this account's Contribution Limits / elective-deferral handling will be wrong too — flag it for a fix.`}
+                    title={`Guessed from the account name as ${a.type}. If that's wrong, the "Am I Contributing the Right Amount?" panel will track it against the wrong limit too — flag it for a fix.`}
                   />
                 </td>
                 <td>
