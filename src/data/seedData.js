@@ -81,4 +81,8 @@ export const seedData = {
   // only the monthly contribution amounts, which Truthifi has no visibility
   // into and the user must maintain by hand.
   syncedContributions: {},
+  // Per-source activity for the Sources & Audit Trail panel, keyed by each
+  // finding's `source` name. Built up automatically every time the findings
+  // feed is checked (see FindingsSync) — never hand-edited.
+  sourceActivity: {},
 };

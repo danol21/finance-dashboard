@@ -96,6 +96,57 @@ textarea {
   padding-top: 1rem;
 }
 
+/* Tab navigation */
+.tab-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+}
+
+.tab-button {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.5rem 0.9rem;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+  background: var(--ink-navy-raised);
+}
+
+.tab-button-active,
+.tab-button-active:hover {
+  color: var(--gold);
+  background: var(--gold-soft);
+  border-color: var(--gold-dim, var(--gold));
+}
+
+/* Each tab's content pane — .app-main itself has no gap of its own, since
+   only one pane is ever visible at a time (the rest sit [hidden]), so the
+   gap between panels has to live here rather than on .app-main. */
+.tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* Needs its own rule (not just the browser default) because it must beat
+   .tab-panel's own `display: flex` above — an author-level rule always wins
+   over the UA stylesheet's built-in `[hidden] { display: none }`, even at
+   equal specificity, so without this every tab-panel stayed visible
+   regardless of its hidden attribute. */
+.tab-panel[hidden] {
+  display: none;
+}
+
 .panel {
   background: var(--ink-navy-raised);
   border: 1px solid var(--border-subtle);
@@ -752,6 +803,107 @@ textarea {
   font-size: 0.78rem;
   color: var(--text-muted);
   white-space: nowrap;
+}
+
+/* Sources & audit trail */
+.sources-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.source-row {
+  background: var(--ink-navy);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.source-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+}
+
+.source-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.source-name a {
+  color: var(--gold);
+  text-decoration: none;
+}
+
+.source-name a:hover {
+  text-decoration: underline;
+}
+
+.source-stat {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.source-dates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.source-history {
+  list-style: none;
+  margin: 0.3rem 0 0;
+  padding: 0.6rem 0 0;
+  border-top: 1px dashed var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.source-history li {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  gap: 0.6rem;
+  align-items: baseline;
+  font-size: 0.8rem;
+}
+
+.source-history-date {
+  color: var(--text-muted);
+}
+
+.source-history-note {
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.source-history-status {
+  font-size: 0.72rem;
+  color: var(--status-flagged);
+  white-space: nowrap;
+}
+
+.source-history-resolved .source-history-status {
+  color: var(--status-ok);
+}
+
+.source-history-resolved .source-history-note {
+  color: var(--text-muted);
+}
+
+@media (max-width: 560px) {
+  .source-history li {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Findings sync */

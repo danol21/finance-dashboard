@@ -10,7 +10,7 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAddTrigger }) {
+export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAddTrigger, onSyncComplete }) {
   const [justLogged, setJustLogged] = useState([]);
   const [expanded, setExpanded] = useState(false);
   const [checking, setChecking] = useState(false);
@@ -40,6 +40,8 @@ export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAdd
           .join("\n\nSuggested action: "),
         rating: findingRatingToTriggerRating(finding.rating),
         resolved: false,
+        source: finding.source ?? null,
+        sourceUrl: finding.url ?? null,
       });
       onMarkReviewed(finding.id);
     });
@@ -47,6 +49,12 @@ export default function FindingsSync({ reviewedFindingIds, onMarkReviewed, onAdd
     if (newOnes.length > 0) {
       setJustLogged((prev) => [...newOnes, ...prev]);
     }
+    // Report every source seen in this check (not just new findings) so the
+    // Sources & Audit Trail panel can tell "this source hasn't produced
+    // anything since March" apart from "this source hasn't been checked
+    // since March" — a source that's still in the feed but quiet is a very
+    // different situation from one that's silently dropped out of it.
+    onSyncComplete?.(results, new Date().toISOString());
     setChecking(false);
   };
 

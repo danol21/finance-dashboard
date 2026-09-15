@@ -139,6 +139,7 @@ export function loadData() {
       checklist: { ...seedData.checklist, ...parsed.checklist },
       reviewedFindingIds: parsed.reviewedFindingIds ?? [],
       syncedContributions: { ...seedData.syncedContributions, ...parsed.syncedContributions },
+      sourceActivity: { ...seedData.sourceActivity, ...parsed.sourceActivity },
       reminders: ensureSeededReminders(parsed.reminders ?? []),
     };
   } catch (err) {
