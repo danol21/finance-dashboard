@@ -1024,7 +1024,6 @@ textarea {
   font-size: 0.85rem;
   color: var(--text-secondary);
   line-height: 1.5;
-  max-width: 72ch;
 }
 
 .fund-holdings {
@@ -1208,5 +1207,4 @@ textarea {
   font-size: 0.85rem;
   color: var(--text-secondary);
   line-height: 1.55;
-  max-width: 72ch;
 }
